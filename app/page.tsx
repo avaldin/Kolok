@@ -6,8 +6,10 @@ import {cn} from "@/lib/utils";
 export default function Home() {
   return (
       <>
-          <main>
-              <header className=""></header>
+          <main >
+              <header className="bg-bistre text-white px-6 py-8 shadow-md">
+
+              </header>
           </main>
       </>
   );
