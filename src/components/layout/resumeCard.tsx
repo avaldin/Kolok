@@ -1,8 +1,9 @@
 'use client'
 
 import  {useState} from "react";
+import {Tool} from "../../../app/page";
 
-const ResumeCard = ({kolokName = "KolokName", users, tools = []}: {kolokName: string, users: string[], tools: string[]}) => {
+const ResumeCard = ({kolokName = "KolokName", users, tools = []}: {kolokName: string, users: string[], tools: Tool[]}) => {
 
     return (
         <div className="w-5/6 justify-center mt-4 mx-auto p-1.5 max-w-2xl bg-brown-sugar rounded-xl border-bistre border-6">
@@ -24,10 +25,10 @@ const ResumeCard = ({kolokName = "KolokName", users, tools = []}: {kolokName: st
 
                 <div className="flex items-center justify-between">
                     <ul className="space-y-1">
-                        {tools.map((tools, index) => (
+                        {tools.map((tool, index) => (
                             <li key={index}>
                                 <div className="bg-atomic-tangerine rounded-xl text-center px-1 border-bistre border-1">
-                                    <span>{tools}</span>
+                                    <span>{tool.name}</span>
                                 </div>
                             </li>
                         ))}
