@@ -1,3 +1,6 @@
+'use client'
+
+
 import { Header } from '@/components/layout/header'
 import ResumeCard from '@/components/layout/resumeCard'
 import React from 'react'
@@ -19,8 +22,7 @@ export default function Home() {
 	const users: string[] = ['emmy', 'antoine', 'alan']
 	const tools: Tool[] = [
 		{ name: 'shoppingList', props: { totalQuantity: 0, newQuantity: 0 } },
-		{ name: 'shoppingList', props: { totalQuantity: 0, newQuantity: 0 } },
-		{ name: 'taches', props: { totalQuantity: 0, newQuantity: 0 } },
+		{ name: 'taches domestique', props: { totalQuantity: 0, newQuantity: 0 } },
 		{ name: 'recette de cuisine', props: { totalQuantity: 0, newQuantity: 0 } }
 	]
 

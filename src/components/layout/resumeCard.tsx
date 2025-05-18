@@ -29,14 +29,14 @@ const ResumeCard = ({ kolokName = 'KolokName', users, tools = [] }: ResumeCardPr
 					</ul>
 				</div>
 
-				<div className="flex-1 bg-atomic-tangerine rounded-xl p-4 shadow space-y-2">
-					<h3 className="text-lg font-semibold text-bistre mb-2">Outils</h3>
-					<ul className="space-y-2">
+				<div className="bg-atomic-tangerine rounded-xl p-4 shadow space-y-2">
+					<h3 className="text-xl font-semibold text-bistre mb-2">Outils</h3>
+					<ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 						{tools.map((tool, index) => (
 							<li key={index}>
 								<Link href={`/tools/${tool.name}`}>
 									<div
-										className="cursor-pointer bg-peach-yellow hover:bg-peach-yellow/90 flex items-center space-x-2">
+										className="cursor-pointer bg-peach-yellow hover:bg-peach-yellow/90 transition text-center py-2 rounded-md border border-bistre text-bistre font-medium">
 										{tool.name}
 									</div>
 								</Link>
