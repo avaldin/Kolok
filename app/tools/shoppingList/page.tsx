@@ -9,12 +9,15 @@ export default function ToolPage() {
 
 	const addItem = () => {
 		if (inputItem.trim() === '') return
-		setItems(prevArray => [...prevArray, {
-			id: itemId,
-			name: inputItem,
-			bought: false
-		}])
-		setItemId(itemId + 1)
+		if (!inputItem.split(/\s+/).some(word => word.length > 20)) {
+			setItems(prevArray => [...prevArray, {
+				id: itemId,
+				name: inputItem,
+				bought: false
+			}])
+			setItemId(itemId + 1)
+		} // handle: creer un popup d'erreur
+
 		setInputItem('')
 	}
 	const toggleBought = (id: number) => {
