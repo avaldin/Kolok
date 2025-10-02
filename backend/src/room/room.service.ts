@@ -16,8 +16,7 @@ export class RoomService {
 
   async createRoom(name: string): Promise<Room> {
     const existingRoom = await this.roomRepository.findOne({ where: { name } });
-    if (existingRoom)
-      throw new ConflictException(`room with name ${name} already exists`);
+    if (existingRoom) throw new ConflictException(`la room${name} existe deja`);
     const room = this.roomRepository.create({ name });
     return this.roomRepository.save(room);
   }
@@ -29,7 +28,7 @@ export class RoomService {
   async findByName(name: string): Promise<Room> {
     const roomByName = await this.roomRepository.findOne({ where: { name } });
     if (!roomByName)
-      throw new NotFoundException(`room with name ${name} doesn't exist`);
+      throw new NotFoundException(`la room ${name} n'existe pas`);
     return roomByName;
   }
 
@@ -40,6 +39,7 @@ export class RoomService {
         `${participantName} est deja dans cette room`,
       );
     room.participants.push(participantName);
+    await this.roomRepository.save(room);
   }
 
   async removeParticipant(
@@ -47,14 +47,11 @@ export class RoomService {
     participantName: string,
   ): Promise<void> {
     const room = await this.findByName(roomName);
-    if (!room.participants.includes(roomName))
+    if (!room.participants.includes(participantName))
       throw new NotFoundException(
         `${participantName} n'est pas dans cette room`,
       );
-  }
-
-  async participantsByRoom(roomName: string): Promise<string[]> {
-    const room = await this.findByName(roomName);
-    return room.participants;
+    room.participants.splice(room.participants.indexOf(participantName), 1);
+    await this.roomRepository.save(room);
   }
 }

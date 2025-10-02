@@ -26,7 +26,7 @@ export class RoomController {
     return this.roomService.findByName(name);
   }
 
-  @Post(`room/:name/participants`)
+  @Post(`:roomName/participants`)
   async addParticipant(
     @Param('roomName', NameValidationPipe) roomName: string,
     @Body('participantName', NameValidationPipe) participantName: string,
@@ -37,13 +37,8 @@ export class RoomController {
   @Delete(':name/participants/:participantName')
   async removeParticipant(
     @Param('participantName', NameValidationPipe) participantName: string,
-    @Param('roomName', NameValidationPipe) roomName: string,
+    @Param('name', NameValidationPipe) roomName: string,
   ) {
     await this.roomService.removeParticipant(roomName, participantName);
-  }
-
-  @Get(':name/participants')
-  async getParticipants(@Param('name', NameValidationPipe) name: string) {
-    return this.roomService.findAll();
   }
 }

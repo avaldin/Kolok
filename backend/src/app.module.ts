@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RoomModule } from './room/room.module';
+import { ShoppingListModule } from './shopping-list/shopping-list.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RoomModule } from './room/room.module';
       synchronize: true,
     }),
     RoomModule,
+    ShoppingListModule,
   ],
   controllers: [AppController],
   providers: [AppService],
