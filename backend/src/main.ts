@@ -5,6 +5,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors({
+    origin: 'http://localhost:3000', // ton Next.js
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Kolok API')
     .setDescription('API pour gerer les rooms et leurs outils')

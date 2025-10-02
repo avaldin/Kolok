@@ -1,4 +1,4 @@
-import { OptionButton } from '@/components/ui/optionButton'
+import { OptionButton } from '../ui/optionButton'
 import React from 'react'
 
 const Header = () => {
