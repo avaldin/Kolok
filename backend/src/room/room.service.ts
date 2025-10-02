@@ -54,4 +54,29 @@ export class RoomService {
     room.participants.splice(room.participants.indexOf(participantName), 1);
     await this.roomRepository.save(room);
   }
+
+  async getTools(name: string): Promise<string[]> {
+    const room = await this.findByName(name);
+    return room.tool;
+  }
+
+  async deleteTool(name: string, toolName: string): Promise<Room> {
+    const room = await this.findByName(name);
+    if (!room.tool.includes(toolName))
+      throw new NotFoundException(
+        `l'outil ${toolName} n'existe pas dans cette kolok`,
+      );
+    room.tool = room.tool.filter((tool) => tool !== toolName);
+    return this.roomRepository.save(room);
+  }
+
+  async addTool(name: string, toolName: string): Promise<Room> {
+    const room = await this.findByName(name);
+    if (room.tool.includes(toolName))
+      throw new NotFoundException(
+        `l'outil ${toolName} existe deja dans cette kolok`,
+      );
+    room.tool.push(toolName);
+    return this.roomRepository.save(room);
+  }
 }

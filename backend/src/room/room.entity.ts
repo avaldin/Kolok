@@ -7,4 +7,7 @@ export class Room {
 
   @Column('text', { array: true, default: [] })
   participants: string[];
+
+  @Column('text', { array: true, default: [] })
+  tool: string[];
 }

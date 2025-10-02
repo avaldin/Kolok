@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { RoomService } from './room.service';
-import { NameValidationPipe } from './pipe/nameValidation.pipe';
+import { NameValidationPipe } from '../common/pipe/nameValidation.pipe';
 import { Room } from './room.entity';
 
 @Controller('room')
@@ -40,5 +40,12 @@ export class RoomController {
     @Param('name', NameValidationPipe) roomName: string,
   ) {
     await this.roomService.removeParticipant(roomName, participantName);
+  }
+
+  @Get(':name/tools')
+  async getToolsByName(
+    @Param('name', NameValidationPipe) name: string,
+  ): Promise<string[]> {
+    return this.roomService.getTools(name);
   }
 }
