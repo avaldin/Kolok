@@ -1,33 +1,69 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { deleteItem, getItems, postItem } from '../../../services/api'
+import { useParams } from 'next/navigation'
 
 export default function ToolPage() {
-	const [items, setItems] = useState<{ id: number, name: string, bought: boolean }[]>([])
-	const [inputItem, setInputItem] = useState('')
-	const [itemId, setItemId] = useState(1)
 
-	const addItem = () => {
-		if (inputItem.trim() === '') return
-		if (!inputItem.split(/\s+/).some(word => word.length > 20)) {
-			setItems(prevArray => [...prevArray, {
-				id: itemId,
-				name: inputItem,
-				bought: false
-			}])
-			setItemId(itemId + 1)
-		} // handle: creer un popup d'erreur
+	const params = useParams()
+
+	if (!params.roomName || typeof params.roomName !== 'string') {
+		return <div>Erreur : nom de room invalide</div>
+	}
+
+	const [items, setItems] = useState<string[]>([])
+	const [inputItem, setInputItem] = useState('')
+	const [loading, setLoading] = useState(true)
+
+	const roomName: string = decodeURIComponent(params.roomName);
+
+	useEffect(() => {
+		const loadItems = async () => {
+			try {
+				const items = await getItems(roomName)
+				console.log(items)
+				setItems(items)
+			} catch (err) {
+				console.error(err)
+			} finally {
+				setLoading(false)
+			}
+		}
+		loadItems()
+	}, [roomName])
+
+	const addItem = async () => {
+		if (
+			!inputItem ||
+			inputItem.trim().length < 3 ||
+			inputItem.trim().length > 25 ||
+			/[^a-z ]/i.test(inputItem) ||
+			items.includes(inputItem.trim())
+		) return (setInputItem(''))
+
+		setItems(prevArray => [...prevArray, inputItem.trim()])
+
+		await postItem(roomName, inputItem.trim())
+		// handle: creer un popup d'erreur
 
 		setInputItem('')
 	}
-	const toggleBought = (id: number) => {
-		setItems(prevArray =>
-			prevArray.map(item =>
-				item.id === id ? { ...item, bought: !item.bought } : item
-			)
-		)
-		// 	back: handle suppression item
+
+	const removeItem = async (itemName: string) => {
+		setItems(prevArray=> [...(prevArray.filter(item => item !== itemName))])
+		await deleteItem(roomName, itemName)
 	}
+
+
+	// const toggleBought = (id: number) => {
+	// 	setItems(prevArray =>
+	// 		prevArray.map(item =>
+	// 			item.id === id ? { ...item, bought: !item.bought } : item
+	// 		)
+	// 	)
+	// 	// 	back: handle suppression item
+	// }
 
 	return (
 		<main className="h-screen p-6 bg-peach-yellow flex flex-col items-center">
@@ -63,17 +99,16 @@ export default function ToolPage() {
 					)}
 					{items.map(item => (
 						<li
-							key={item.id}
+							key={item}
 							className={`flex items-center gap-2 px-4 py-3 rounded-md border border-bistre 
-							bg-atomic-tangerine ${item.bought ? 'line-through text-cadet-gray' : ''}
-							`}
+							bg-atomic-tangerine`}
 						>
-							<span className="flex-1 break-words">{`${item.name}`}</span>
+							<span className="flex-1 break-words">{`${item}`}</span>
 							<div className="flex items-center">
 								<input
 									type="checkbox"
-									checked={item.bought}
-									onChange={() => toggleBought(item.id)}
+									checked={false}
+									onChange={() => removeItem(item)}
 									className="w-5 h-5 cursor-pointer bg-cadet-gray appearance-none rounded border border-bistre checked:bg-bistre"
 								/>
 							</div>

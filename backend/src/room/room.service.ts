@@ -57,26 +57,26 @@ export class RoomService {
 
   async getTools(name: string): Promise<string[]> {
     const room = await this.findByName(name);
-    return room.tool;
+    return room.tools;
   }
 
-  async deleteTool(name: string, toolName: string): Promise<Room> {
+  async deleteTool(name: string, toolsName: string): Promise<Room> {
     const room = await this.findByName(name);
-    if (!room.tool.includes(toolName))
+    if (!room.tools.includes(toolsName))
       throw new NotFoundException(
-        `l'outil ${toolName} n'existe pas dans cette kolok`,
+        `l'outil ${toolsName} n'existe pas dans cette kolok`,
       );
-    room.tool = room.tool.filter((tool) => tool !== toolName);
+    room.tools = room.tools.filter((tools) => tools !== toolsName);
     return this.roomRepository.save(room);
   }
 
-  async addTool(name: string, toolName: string): Promise<Room> {
+  async addTool(name: string, toolsName: string): Promise<Room> {
     const room = await this.findByName(name);
-    if (room.tool.includes(toolName))
+    if (room.tools.includes(toolsName))
       throw new NotFoundException(
-        `l'outil ${toolName} existe deja dans cette kolok`,
+        `l'outil ${toolsName} existe deja dans cette kolok`,
       );
-    room.tool.push(toolName);
+    room.tools.push(toolsName);
     return this.roomRepository.save(room);
   }
 }

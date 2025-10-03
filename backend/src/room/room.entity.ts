@@ -9,5 +9,5 @@ export class Room {
   participants: string[];
 
   @Column('text', { array: true, default: [] })
-  tool: string[];
+  tools: string[];
 }
