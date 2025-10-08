@@ -1,12 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { config } from 'dotenv';
+import { validateEnv } from './config/env.config';
+
+config();
+
+const env = validateEnv(process.env);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:3000', // ton Next.js
+    origin: env.FRONTEND_URL,
     credentials: true,
   });
 
@@ -19,7 +25,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 4000);
+  await app.listen(env.PORT);
 }
 
 bootstrap();

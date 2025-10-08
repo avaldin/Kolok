@@ -23,6 +23,9 @@ export class EnvConfig {
 
   @IsString()
   DB_NAME: string;
+
+  @IsString()
+  FRONTEND_URL: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
@@ -35,9 +38,7 @@ export function validateEnv(config: Record<string, unknown>) {
   });
 
   if (errors.length > 0) {
-    throw new Error(
-      `Env validation failed\n\n .env have to be formated as :\n\n${JSON.stringify(EnvConfig.prototype, null, 2)}`,
-    );
+    throw new Error(`Env validation failed`);
   }
   return validationConfig;
 }
