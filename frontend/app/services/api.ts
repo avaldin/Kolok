@@ -14,7 +14,7 @@ export async function getRoom(roomName: string): Promise<Room> {
 	)
 		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
 	console.log(`${API_URL}/room/${roomName}`)
-	const response = await fetch(`${API_URL}/room/${roomName}`)
+	const response = await fetch(`${API_URL}/room/${encodeURIComponent(roomName)}`)
 	if (!response.ok) {
 		if (response.status === 404) {
 			throw new Error(`La room "${roomName}" n'existe pas`)
@@ -37,7 +37,7 @@ export async function postItem(roomName: string, items: string) {
 		/[^a-z ]/i.test(roomName)
 	)
 		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
-	const response = await fetch(`${API_URL}/shopping-list/${roomName}/items`, {
+	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/items`, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: JSON.stringify({items: items}),
@@ -55,7 +55,7 @@ export async function getItems(roomName: string) {
 		/[^a-z ]/i.test(roomName)
 	)
 		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
-	const response = await fetch(`${API_URL}/shopping-list/${roomName}/items`)
+	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/items`)
 	if (!response.ok) {
 		if (response.status === 404) {
 			throw new Error(`La room "${roomName}" n'existe pas`)
@@ -76,7 +76,7 @@ export async function deleteItem(roomName: string, item: string) {
 		/[^a-z ]/i.test(roomName)
 	)
 		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
-	const response = await fetch(`${API_URL}/shopping-list/${roomName}/items/${item}`, {
+	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/items/${encodeURIComponent(item)}`, {
 		method: 'DELETE',
 		headers: {'Content-Type': 'application/json'},
 	})
