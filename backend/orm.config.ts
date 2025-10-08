@@ -8,11 +8,7 @@ const envConfig = validateEnv(process.env);
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  host: envConfig.DB_HOST,
-  port: envConfig.DB_PORT,
-  username: envConfig.DB_USERNAME,
-  password: envConfig.DB_PASSWORD,
-  database: envConfig.DB_NAME,
+  url: envConfig.DATABASE_URL,
 
   entities: ['src/**/*.entity.ts'],
 

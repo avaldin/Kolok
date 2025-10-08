@@ -8,24 +8,10 @@ export class EnvConfig {
   PORT: number;
 
   @IsString()
-  DB_HOST: string;
-
-  @IsNumber()
-  @Min(1)
-  @Max(65535)
-  DB_PORT: number;
-
-  @IsString()
-  DB_USERNAME: string;
-
-  @IsString()
-  DB_PASSWORD: string;
-
-  @IsString()
-  DB_NAME: string;
-
-  @IsString()
   FRONTEND_URL: string;
+
+  @IsString()
+  DATABASE_URL: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
