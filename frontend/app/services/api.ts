@@ -13,6 +13,7 @@ export async function getRoom(roomName: string): Promise<Room> {
 		/[^a-z ]/i.test(roomName)
 	)
 		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
+	console.log(`${API_URL}/room/${roomName}`)
 	const response = await fetch(`${API_URL}/room/${roomName}`)
 	if (!response.ok) {
 		if (response.status === 404) {
