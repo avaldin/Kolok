@@ -16,7 +16,8 @@ export class RoomService {
 
   async createRoom(name: string): Promise<Room> {
     const existingRoom = await this.roomRepository.findOne({ where: { name } });
-    if (existingRoom) throw new ConflictException(`la room${name} existe deja`);
+    if (existingRoom)
+      throw new ConflictException(`la room ${name} existe deja`);
     const room = this.roomRepository.create({ name });
     return this.roomRepository.save(room);
   }

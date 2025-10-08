@@ -5,6 +5,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RoomModule } from './room/room.module';
 import { ShoppingListModule } from './shopping-list/shopping-list.module';
+import { validateEnv } from './config/env.config';
+import { config } from 'dotenv';
+
+config();
+
+const envConfig = validateEnv(process.env);
 
 @Module({
   imports: [
@@ -13,13 +19,14 @@ import { ShoppingListModule } from './shopping-list/shopping-list.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT as string),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      host: envConfig.DB_HOST,
+      port: envConfig.DB_PORT,
+      username: envConfig.DB_USERNAME,
+      password: envConfig.DB_PASSWORD,
+      database: envConfig.DB_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: false,
+      migrationsRun: true,
     }),
     RoomModule,
     ShoppingListModule,
