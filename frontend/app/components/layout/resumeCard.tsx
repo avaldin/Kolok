@@ -35,7 +35,7 @@ const ResumeCard = ({ name, participants, tools }: Room) => {
 					<ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 						{tools.map((tool, index) => (
 							<li key={index}>
-								<Link href={`/tools/${name}/${tool}`}>
+								<Link href={`/${encodeURIComponent(name)}/tools/${tool}`}>
 									<div
 										className="cursor-pointer bg-peach-yellow hover:bg-peach-yellow/90 transition text-center py-2 rounded-md border border-bistre text-bistre font-medium">
 										{tool}
