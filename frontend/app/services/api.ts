@@ -27,9 +27,7 @@ export async function getRoom(roomName: string): Promise<Room> {
 	return data
 }
 
-export async function postItem(roomName: string, items: string) {
-	console.log(roomName, items)
-
+export async function postItem(roomName: string, item: string) {
 	if (
 		!roomName ||
 		roomName.trim().length < 3 ||
@@ -37,10 +35,10 @@ export async function postItem(roomName: string, items: string) {
 		/[^a-z ]/i.test(roomName)
 	)
 		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
-	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/items`, {
+	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/item`, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
-		body: JSON.stringify({items: items}),
+		body: JSON.stringify({item: item}),
 	})
 	if (!response.ok) {
 		throw new Error(`Erreur ${response.status}`)
@@ -76,7 +74,7 @@ export async function deleteItem(roomName: string, item: string) {
 		/[^a-z ]/i.test(roomName)
 	)
 		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
-	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/items/${encodeURIComponent(item)}`, {
+	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/item/${encodeURIComponent(item)}`, {
 		method: 'DELETE',
 		headers: {'Content-Type': 'application/json'},
 	})

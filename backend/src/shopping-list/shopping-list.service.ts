@@ -43,22 +43,22 @@ export class ShoppingListService {
     return shoppingList;
   }
 
-  async addItems(roomName: string, items: string) {
+  async addItem(roomName: string, item: string) {
     const shoppingList = await this.getShoppingList(roomName);
 
-    if (shoppingList.items.includes(items)) {
+    if (shoppingList.items.includes(item)) {
       throw new ConflictException(`cette article est deja dans la liste`);
     }
-    shoppingList.items.push(items);
+    shoppingList.items.push(item);
     return this.shoppingListRepository.save(shoppingList);
   }
 
-  async deleteItems(roomName: string, items: string) {
+  async deleteItem(roomName: string, item: string) {
     const shoppingList = await this.getShoppingList(roomName);
-    if (!shoppingList.items.includes(items)) {
+    if (!shoppingList.items.includes(item)) {
       throw new NotFoundException(`cette article n'est pas dans la liste`);
     }
-    shoppingList.items = shoppingList.items.filter((item) => item !== items);
+    shoppingList.items = shoppingList.items.filter((i) => i !== item);
     return this.shoppingListRepository.save(shoppingList);
   }
 

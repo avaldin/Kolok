@@ -28,21 +28,21 @@ export class ShoppingListController {
     return this.shoppingListService.delete(roomName);
   }
 
-  @Post(':roomName/items')
+  @Post(':roomName/item')
   @HttpCode(201)
-  async addItems(
+  async addItem(
     @Param('roomName', NameValidationPipe) roomName: string,
-    @Body('items', NameValidationPipe) items: string,
+    @Body('item', NameValidationPipe) item: string,
   ) {
-    return this.shoppingListService.addItems(roomName, items);
+    return this.shoppingListService.addItem(roomName, item);
   }
 
-  @Delete(':roomName/items/:itemName')
-  async deleteItems(
+  @Delete(':roomName/item/:itemName')
+  async deleteItem(
     @Param('roomName', NameValidationPipe) roomName: string,
     @Param('itemName', NameValidationPipe) itemName: string,
   ) {
-    return this.shoppingListService.deleteItems(roomName, itemName);
+    return this.shoppingListService.deleteItem(roomName, itemName);
   }
 
   @Get(':roomName/items')
