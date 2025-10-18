@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { kolokNameValidator } from '../../lib/validation'
+import { createRoom, getRoom, joinRoom } from '../../services/api'
 
 interface SetupKolokNameProps {
 	onKolokNameSet: (name: string) => void
@@ -8,16 +10,79 @@ interface SetupKolokNameProps {
 
 export default function SetupKolokName({onKolokNameSet}: SetupKolokNameProps) {
 	const [input, setInput] = useState('')
+	const [error, setError] = useState('')
 
-	const handleSubmit = () => {
-		onKolokNameSet(input)
+	const handleJoin = async () => {
+		if (await getRoom(input.trim())) {
+			onKolokNameSet(input.trim())
+		}
+		setInput('')
+	}
+
+	const handleCreate = async () => {
+		if (await createRoom(input.trim())) {
+			await joinRoom(input.trim())
+			onKolokNameSet(input.trim())
+		}
+		setInput('')
+	}
+
+	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			handleJoin()
+		}
 	}
 
 	return (
-		<div>
-			<input value={input} onChange={(e) => setInput(e.target.value)} />
-			<button onClick={handleSubmit}>Valider</button>
-		</div>
+		<main className="flex min-h-screen items-center justify-center bg-peach-yellow p-4">
+			<div className="w-full max-w-md bg-brown-sugar rounded-2xl border-4 border-bistre p-8 shadow-md">
+				<h1 className="text-3xl font-extrabold text-bistre text-center mb-6">
+					Rejoindre une KoloK
+				</h1>
 
+				<div className="space-y-4">
+					<label className="block">
+						<span className="text-lg font-semibold text-bistre mb-2 block">
+							Nom de votre colocation
+						</span>
+						<input
+							type="text"
+							value={input}
+							onChange={(e) => setInput(e.target.value)}
+							onKeyPress={handleKeyPress}
+							placeholder="Nom de la colocation..."
+							className="w-full px-4 py-3 rounded-md border-2 border-bistre bg-cadet-gray text-bistre placeholder-bistre/60 focus:outline-none focus:ring-2 focus:ring-atomic-tangerine"
+						/>
+						{error && (
+							<p className="mt-2 text-sm text-red-700 font-semibold">
+								{error}
+							</p>
+						)}
+					</label>
+
+					<div className="flex gap-3">
+						<button
+							onClick={handleJoin}
+							disabled={!kolokNameValidator(input)}
+							className="flex-1 px-6 py-3 rounded-md border-2 border-bistre bg-atomic-tangerine text-bistre font-semibold hover:bg-atomic-tangerine/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							Rejoindre
+						</button>
+
+						<button
+							onClick={handleCreate}
+							disabled={!kolokNameValidator(input)}
+							className="flex-1 px-6 py-3 rounded-md border-2 border-bistre bg-atomic-tangerine text-bistre font-semibold hover:bg-atomic-tangerine/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							Créer
+						</button>
+					</div>
+
+					<p className="text-sm text-bistre/70 text-center mt-4">
+						Le nom doit contenir entre 3 et 25 caractères (lettres et espaces uniquement)
+					</p>
+				</div>
+			</div>
+		</main>
 	)
 }

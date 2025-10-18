@@ -5,6 +5,7 @@ import { storage } from '../lib/storage'
 import SetupName from './setup/SetupName'
 import SetupKolokName from './setup/SetupKolokName'
 import MainApp from './main/MainApp'
+import { getRoom } from '../services/api'
 
 export default function AppRouter() {
 	const [userName, setUserName] = useState<string | null>()
@@ -16,8 +17,16 @@ export default function AppRouter() {
 		const kolok = storage.getKolokName()
 
 		setUserName(userName)
-		setKolokName(kolok)
-		setIsInitialized(true)
+		const setKolokNameIfExists = async () => {
+			if (kolok  && await getRoom(kolok))
+				setKolokName(kolok)
+			else {
+				setKolokName('')
+				storage.setKolokName('')
+			}
+			setIsInitialized(true)
+		}
+		setKolokNameIfExists()
 	}, [])
 
 	if (!isInitialized) {
@@ -48,5 +57,12 @@ export default function AppRouter() {
 	}
 
 
-	return <MainApp userName={userName} kolokName={kolokName} />
+	return <MainApp
+		userName={userName}
+		kolokName={kolokName}
+		clearKolokNameAction={() => {
+			storage.setKolokName('')
+			setKolokName('')
+		}}
+	/>
 }

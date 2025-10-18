@@ -26,7 +26,7 @@ export class RoomController {
     return this.roomService.findByName(name);
   }
 
-  @Post(`:roomName/participants`)
+  @Post(`:roomName/participant`)
   async addParticipant(
     @Param('roomName', NameValidationPipe) roomName: string,
     @Body('participantName', NameValidationPipe) participantName: string,

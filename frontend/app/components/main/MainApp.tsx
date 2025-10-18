@@ -14,9 +14,10 @@ interface Room {
 interface MainAppProps {
 	userName: string,
 	kolokName: string,
+	clearKolokNameAction: () => void
 }
 
-export default function MainApp({userName, kolokName}: MainAppProps) {
+export default function MainApp({userName, kolokName, clearKolokNameAction}: MainAppProps) {
 	const [room, setRoom] = React.useState<Room | null>()
 	const [loading, setLoading] = React.useState<boolean>(true)
 
@@ -27,10 +28,10 @@ export default function MainApp({userName, kolokName}: MainAppProps) {
 		const loadRoom = async () => {
 			setLoading(true)
 			try {
-				const room: Room = await getRoom(kolokName)
+				const room: Room | null = await getRoom(kolokName)
 				setRoom(room)
 			} catch (error) {
-				console.error(`la kolok n'existe pas, gestion d'erreur ici:`, error)
+				console.error(`internal eror:`, error)
 			} finally {
 				setLoading(false)
 			}
@@ -53,14 +54,8 @@ export default function MainApp({userName, kolokName}: MainAppProps) {
 	}
 
 	if (!room) {
-		return (<>
-			<main className="flex flex-col min-h-screen justify-center">
-				<Header/>
-				<div className="flex-1 flex items-center">
-					<p>erreur a handle, cas ou la room n'existe pas</p>
-				</div>
-			</main>
-		</>)
+		clearKolokNameAction()
+		return
 	}
 
 	return (
