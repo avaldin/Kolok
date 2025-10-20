@@ -17,7 +17,7 @@ export class ShoppingListService {
   ) {}
 
   async create(roomName: string): Promise<ShoppingList> {
-    await this.roomService.addTool(roomName, 'shoppingList');
+    await this.roomService.addTool(roomName, 'shopping-list');
 
     const shoppingList = this.shoppingListRepository.create({
       roomName: roomName,
@@ -27,7 +27,7 @@ export class ShoppingListService {
   }
 
   async delete(roomName: string) {
-    await this.roomService.deleteTool(roomName, 'shoppingList');
+    await this.roomService.deleteTool(roomName, 'shopping-list');
     return this.shoppingListRepository.delete(roomName);
   }
 

@@ -3,8 +3,11 @@
 import { useEffect, useState } from 'react'
 import { deleteItem, getItems, postItem } from '../../../services/api'
 import { useParams } from 'next/navigation'
+import { useToast } from '../../../lib/toast'
+
 
 export default function ToolPage() {
+	const { showToast } = useToast()
 
 	const params = useParams()
 
@@ -22,10 +25,10 @@ export default function ToolPage() {
 		const loadItems = async () => {
 			try {
 				const items = await getItems(roomName)
-				console.log(items)
 				setItems(items)
-			} catch (err) {
-				console.error(err)
+			} catch (e) {
+				if (e instanceof Error)
+					showToast(e.message, 'error')
 			} finally {
 				setLoading(false)
 			}
@@ -34,25 +37,27 @@ export default function ToolPage() {
 	}, [roomName])
 
 	const addItem = async () => {
-		if (
-			!inputItem ||
-			inputItem.trim().length < 3 ||
-			inputItem.trim().length > 25 ||
-			/[^a-z ]/i.test(inputItem) ||
-			items.includes(inputItem.trim())
-		) return (setInputItem(''))
-
-		setItems(prevArray => [...prevArray, inputItem.trim()])
-
-		await postItem(roomName, inputItem.trim())
-		// handle: creer un popup d'erreur
-
-		setInputItem('')
+		try {
+			await postItem(roomName, inputItem.trim())
+			setItems(prevArray => [...prevArray, inputItem.trim()])
+			setInputItem('')
+		}
+		catch (e) {
+			if (e instanceof Error)
+				showToast(e.message, 'error')
+			setInputItem('')
+		}
 	}
 
 	const removeItem = async (itemName: string) => {
-		setItems(prevArray=> [...(prevArray.filter(item => item !== itemName))])
+		try {
 		await deleteItem(roomName, itemName)
+		setItems(prevArray=> [...(prevArray.filter(item => item !== itemName))])
+		} catch (e) {
+			if (e instanceof Error)
+				showToast(e.message, 'error')
+			setInputItem('')
+		}
 	}
 
 
