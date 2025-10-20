@@ -4,8 +4,11 @@ import { Home, Settings, User } from 'lucide-react'
 import { useState } from 'react'
 import { storage } from '../../lib/storage'
 import { quitRoom } from '../../services/api'
+import { useToast } from './Toast'
+
 
 function OptionButton() {
+	const { showToast } = useToast()
     const [isOpen, setIsOpen] = useState(false);
 
     const handleChangeName = async () => {
@@ -15,9 +18,14 @@ function OptionButton() {
     };
 
     const handleChangeKolok = async () => {
-        await quitRoom(storage.getKolokName())
+        try {
+		await quitRoom(storage.getKolokName() ?? '')
 		storage.clearKolokName();
 		window.location.reload();
+		} catch (e) {
+			if (e instanceof Error)
+				showToast(e.message, 'error')
+		}
     };
 
     return (

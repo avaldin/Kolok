@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { nameValidator } from '../../lib/validation'
+import { useToast } from '../ui/Toast'
 
 interface SetupNameProps {
 	onNameSet: (name: string) => void
@@ -10,12 +11,14 @@ interface SetupNameProps {
 export default function SetupName({onNameSet}: SetupNameProps) {
 	const [input, setInput] = useState('')
 
+	const {showToast} = useToast()
+
 	const handleSubmit = () => {
 		if (nameValidator(input.trim()))
 			onNameSet(input.trim())
 		else {
 			setInput('')
-			//error popup
+			showToast(`le nom  doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 20 caracteres`, 'error')
 		}
 
 	}

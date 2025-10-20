@@ -8,25 +8,23 @@ interface Room {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
-export async function getRoom(roomName: string): Promise< Room | null> {
+export async function getRoom(roomName: string): Promise< Room> {
 	if (!kolokNameValidator(roomName))
-		return null
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const response = await fetch(`${API_URL}/room/${encodeURIComponent(roomName)}`)
 	if (!response.ok) {
-		if (response.status === 404) {
-			return null
+		if (response.status) {
+			const errorData = await response.json()
+			throw new Error(errorData.message)
 		}
 		throw new Error(`Erreur ${response.status}`)
 	}
-	const data = response.json()
-	if (!data)
-		throw new Error(`idk`)
-	return data
+	return response.json()
 }
 
-export async function createRoom(roomName: string): Promise< Room | null> {
+export async function createRoom(roomName: string): Promise< Room> {
 	if (!kolokNameValidator(roomName))
-		return null //popup
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const response = await fetch(`${API_URL}/room`, {
 		method: 'POST',
 		body: JSON.stringify({name: roomName}),
@@ -34,42 +32,37 @@ export async function createRoom(roomName: string): Promise< Room | null> {
 	})
 	if (!response.ok) {
 		if (response.status === 409) {
-			return null //popup
+			const errorData = await response.json()
+			throw new Error(errorData.message)
 		}
 		throw new Error(`Erreur ${response.status}`)
 	}
-	const data = response.json()
-	if (!data)
-		throw new Error(`idk`)
-	return data
+	return response.json()
 }
 
 
 export async function postItem(roomName: string, item: string) {
-	if (
-		!roomName ||
-		roomName.trim().length < 3 ||
-		roomName.trim().length > 25 ||
-		/[^a-z ]/i.test(roomName)
-	)
-		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
+	if (!nameValidator(roomName))
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/item`, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: JSON.stringify({item: item}),
 	})
 	if (!response.ok) {
-		throw new Error(`Erreur ${response.status}`)
+		const errorData = await response.json()
+		throw new Error(errorData.message)
 	}
 }
 
 export async function joinRoom(roomName: string): Promise<void> {
 	if (!kolokNameValidator(roomName))
-		return //popup
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const username = storage.getUserName()
-	console.log(username, roomName)
-	if (!username || !nameValidator(username))
-		return //popup
+	if (!username)
+		throw new Error(`le nom d'utilisateur doit etre choisi avant de rejoindre une kolok`)
+	if (!nameValidator(username))
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const response = await fetch(`${API_URL}/room/${encodeURIComponent(roomName)}/participant`, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
@@ -77,25 +70,21 @@ export async function joinRoom(roomName: string): Promise<void> {
 	})
 	if (!response.ok) {
 		if (response.status === 409) {
-			console.log('error')
-			return   //popup
+			const errorData = await response.json()
+			throw new Error(errorData.message)
 		}
 		throw new Error(`Erreur ${response.status}`)
 	}
 }
 
 export async function getItems(roomName: string) {
-	if (
-		!roomName ||
-		roomName.trim().length < 3 ||
-		roomName.trim().length > 25 ||
-		/[^a-z ]/i.test(roomName)
-	)
-		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
+	if (!kolokNameValidator(roomName))
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/items`)
 	if (!response.ok) {
 		if (response.status === 404) {
-			throw new Error(`La room "${roomName}" n'existe pas`)
+			const errorData = await response.json()
+			throw new Error(errorData.message)
 		}
 		throw new Error(`Erreur ${response.status}`)
 	}
@@ -106,32 +95,27 @@ export async function getItems(roomName: string) {
 }
 
 export async function deleteItem(roomName: string, item: string) {
-	if (
-		!roomName ||
-		roomName.trim().length < 3 ||
-		roomName.trim().length > 25 ||
-		/[^a-z ]/i.test(roomName)
-	)
-		throw new Error(`Le nom doit avoir une taille entre 3 et 25, et doit être composé uniquement de lettre`)
+	if (!kolokNameValidator(roomName))
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const response = await fetch(`${API_URL}/shopping-list/${encodeURIComponent(roomName)}/item/${encodeURIComponent(item)}`, {
 		method: 'DELETE',
 		headers: {'Content-Type': 'application/json'},
 	})
 	if (!response.ok) {
 		if (response.status === 404) {
-			throw new Error(`La room "${roomName}" n'existe pas`)
+			const errorData = await response.json()
+			throw new Error(errorData.message)
 		}
 		throw new Error(`Erreur ${response.status}`)
 	}
 }
 
-export async function quitRoom(roomName: string | null): Promise<void> {
+export async function quitRoom(roomName: string): Promise<void> {
 	if (!roomName || !kolokNameValidator(roomName))
-		return //popup
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const username = storage.getUserName()
-	console.log(username, roomName)
 	if (!username || !nameValidator(username))
-		return //popup
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 20 caracteres`)
 	const response = await fetch(`${API_URL}/room/${encodeURIComponent(roomName)}/participant`, {
 		method: 'DELETE',
 		headers: {'Content-Type': 'application/json'},
@@ -139,8 +123,8 @@ export async function quitRoom(roomName: string | null): Promise<void> {
 	})
 	if (!response.ok) {
 		if (response.status === 409) {
-			console.log('error')
-			return   //popup
+			const errorData = await response.json()
+			throw new Error(errorData.message)
 		}
 		throw new Error(`Erreur ${response.status}`)
 	}
@@ -148,12 +132,13 @@ export async function quitRoom(roomName: string | null): Promise<void> {
 
 export async function addTool(roomName: string, tool: string) {
 	if (!kolokNameValidator(roomName))
-		return // popup
+		throw new Error(`le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`)
 	const response = await fetch(`${API_URL}/${encodeURIComponent(tool)}/${encodeURIComponent(roomName)}`, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 	})
 	if (!response.ok) {
-		throw new Error(`Erreur ${response.status}`)
+		const errorData = await response.json()
+		throw new Error(errorData.message)
 	}
 }

@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { Plus, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { addTool } from '../../services/api'
+import { useToast } from '../ui/Toast'
 
 interface Room {
 	name: string,
@@ -23,17 +24,37 @@ const ALL_AVAILABLE_TOOLS = [
 const ResumeCard = ({ name, participants, tools }: Room) => {
 	const [showAddTool, setShowAddTool] = useState(false)
 	const [currentTools, setCurrentTools] = useState<string[]>(tools)
+	const { showToast } = useToast()
+	const dropdownRef = useRef<HTMLDivElement>(null)
 
 	const availableTools = ALL_AVAILABLE_TOOLS.filter(tool => !currentTools.includes(tool))
+
+	// Fermer le menu si on clique en dehors
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				setShowAddTool(false)
+			}
+		}
+
+		if (showAddTool) {
+			document.addEventListener('mousedown', handleClickOutside)
+		}
+
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [showAddTool])
 
 	const handleAddTool = async (toolName: string) => {
 		try {
 			await addTool(name, toolName)
 			setCurrentTools([...currentTools, toolName])
 			setShowAddTool(false)
-		} catch (err) {
-			console.log(`cette outil n'est toujours pas implemente`)
-			// popup
+			showToast(`L'outil "${toolName}" a été ajouté avec succès`, 'success')
+		} catch (e) {
+			if (e instanceof Error)
+				showToast(e.message, 'error')
 		}
 	}
 
@@ -61,7 +82,7 @@ const ResumeCard = ({ name, participants, tools }: Room) => {
 					<div className="flex items-center justify-between mb-2 gap-4">
 						<h3 className="text-xl font-semibold text-bistre">Outils</h3>
 						{availableTools.length > 0 && (
-							<div className="relative">
+							<div className="relative" ref={dropdownRef}>
 								<button
 									onClick={() => setShowAddTool(!showAddTool)}
 									className="p-1 bg-peach-yellow hover:bg-cadet-gray transition rounded-md border border-bistre"

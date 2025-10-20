@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { kolokNameValidator } from '../../lib/validation'
 import { createRoom, getRoom, joinRoom } from '../../services/api'
+import { useToast } from '../ui/Toast'
 
 interface SetupKolokNameProps {
 	onKolokNameSet: (name: string) => void
@@ -11,27 +12,35 @@ interface SetupKolokNameProps {
 export default function SetupKolokName({onKolokNameSet}: SetupKolokNameProps) {
 	const [input, setInput] = useState('')
 	const [error, setError] = useState('')
+	const { showToast } = useToast()
 
 	const handleJoin = async () => {
-		const kolokInfo = await getRoom(input.trim())
-		if (kolokInfo) {
+		try {
+			await getRoom(input.trim())
 			onKolokNameSet(input.trim())
 			await joinRoom(input.trim())
+		} catch (e) {
+			if (e instanceof Error)
+				showToast(e.message, 'error')
+			setInput('')
 		}
-		setInput('')
 	}
 
 	const handleCreate = async () => {
-		if (await createRoom(input.trim())) {
+		try {
+			await createRoom(input.trim())
 			await joinRoom(input.trim())
 			onKolokNameSet(input.trim())
+		} catch (e) {
+			if (e instanceof Error)
+				showToast(e.message, 'error')
+			setInput('')
 		}
-		setInput('')
 	}
 
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+	const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
-			handleJoin()
+			await handleJoin()
 		}
 	}
 

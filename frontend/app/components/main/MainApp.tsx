@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { getRoom } from '../../services/api'
 import { Header } from '../layout/header'
 import ResumeCard from '../layout/resumeCard'
+import { useToast } from '../ui/Toast'
 
 interface Room {
 	name: string,
@@ -21,6 +22,7 @@ export default function MainApp({userName, kolokName, clearKolokNameAction}: Mai
 	const [room, setRoom] = React.useState<Room | null>()
 	const [loading, setLoading] = React.useState<boolean>(true)
 
+	const { showToast } = useToast()
 
 	useEffect(() => {
 		if (!userName || !kolokName) return
@@ -28,10 +30,11 @@ export default function MainApp({userName, kolokName, clearKolokNameAction}: Mai
 		const loadRoom = async () => {
 			setLoading(true)
 			try {
-				const room: Room | null = await getRoom(kolokName)
+				const room: Room = await getRoom(kolokName)
 				setRoom(room)
-			} catch (error) {
-				console.error(`internal eror:`, error)
+			} catch (e) {
+				if (e instanceof Error)
+					showToast(e.message, 'error')
 			} finally {
 				setLoading(false)
 			}
