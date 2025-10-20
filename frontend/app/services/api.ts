@@ -145,3 +145,15 @@ export async function quitRoom(roomName: string | null): Promise<void> {
 		throw new Error(`Erreur ${response.status}`)
 	}
 }
+
+export async function addTool(roomName: string, tool: string) {
+	if (!kolokNameValidator(roomName))
+		return // popup
+	const response = await fetch(`${API_URL}/${encodeURIComponent(tool)}/${encodeURIComponent(roomName)}`, {
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+	})
+	if (!response.ok) {
+		throw new Error(`Erreur ${response.status}`)
+	}
+}
