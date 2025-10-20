@@ -1,4 +1,4 @@
-import { kolokNameValidator } from '../lib/validation'
+import { kolokNameValidator, nameValidator } from '../lib/validation'
 import { storage } from '../lib/storage'
 
 interface Room {
@@ -67,7 +67,8 @@ export async function joinRoom(roomName: string): Promise<void> {
 	if (!kolokNameValidator(roomName))
 		return //popup
 	const username = storage.getUserName()
-	if (!username)
+	console.log(username, roomName)
+	if (!username || !nameValidator(username))
 		return //popup
 	const response = await fetch(`${API_URL}/room/${encodeURIComponent(roomName)}/participant`, {
 		method: 'POST',
@@ -75,7 +76,8 @@ export async function joinRoom(roomName: string): Promise<void> {
 		body: JSON.stringify({participantName: username}),
 	})
 	if (!response.ok) {
-		if (response.status === 404) {
+		if (response.status === 409) {
+			console.log('error')
 			return   //popup
 		}
 		throw new Error(`Erreur ${response.status}`)
@@ -118,6 +120,27 @@ export async function deleteItem(roomName: string, item: string) {
 	if (!response.ok) {
 		if (response.status === 404) {
 			throw new Error(`La room "${roomName}" n'existe pas`)
+		}
+		throw new Error(`Erreur ${response.status}`)
+	}
+}
+
+export async function quitRoom(roomName: string | null): Promise<void> {
+	if (!roomName || !kolokNameValidator(roomName))
+		return //popup
+	const username = storage.getUserName()
+	console.log(username, roomName)
+	if (!username || !nameValidator(username))
+		return //popup
+	const response = await fetch(`${API_URL}/room/${encodeURIComponent(roomName)}/participant`, {
+		method: 'DELETE',
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify({participantName: username}),
+	})
+	if (!response.ok) {
+		if (response.status === 409) {
+			console.log('error')
+			return   //popup
 		}
 		throw new Error(`Erreur ${response.status}`)
 	}

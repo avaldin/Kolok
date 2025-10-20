@@ -13,8 +13,10 @@ export default function SetupKolokName({onKolokNameSet}: SetupKolokNameProps) {
 	const [error, setError] = useState('')
 
 	const handleJoin = async () => {
-		if (await getRoom(input.trim())) {
+		const kolokInfo = await getRoom(input.trim())
+		if (kolokInfo) {
 			onKolokNameSet(input.trim())
+			await joinRoom(input.trim())
 		}
 		setInput('')
 	}

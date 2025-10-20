@@ -23,6 +23,14 @@ export const storage = {
 		localStorage.setItem(STORAGE_KEYS.KOLOK_NAME, kolokName)
 	},
 
+	clearUserName: (): void => {
+		localStorage.removeItem(STORAGE_KEYS.USER_NAME)
+	},
+
+	clearKolokName: (): void => {
+		localStorage.removeItem(STORAGE_KEYS.KOLOK_NAME)
+	},
+
 	clearAll: (): void => {
 		localStorage.removeItem(STORAGE_KEYS.KOLOK_NAME)
 		localStorage.removeItem(STORAGE_KEYS.USER_NAME)

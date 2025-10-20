@@ -34,10 +34,10 @@ export class RoomController {
     await this.roomService.addParticipant(roomName, participantName);
   }
 
-  @Delete(':name/participants/:participantName')
+  @Delete(':name/participant')
   async removeParticipant(
-    @Param('participantName', NameValidationPipe) participantName: string,
     @Param('name', NameValidationPipe) roomName: string,
+    @Body('participantName', NameValidationPipe) participantName: string,
   ) {
     await this.roomService.removeParticipant(roomName, participantName);
   }

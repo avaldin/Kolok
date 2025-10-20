@@ -18,7 +18,7 @@ export default function AppRouter() {
 
 		setUserName(userName)
 		const setKolokNameIfExists = async () => {
-			if (kolok  && await getRoom(kolok))
+			if (kolok && await getRoom(kolok))
 				setKolokName(kolok)
 			else {
 				setKolokName('')
@@ -55,7 +55,6 @@ export default function AppRouter() {
 			}}
 		/>
 	}
-
 
 	return <MainApp
 		userName={userName}
