@@ -10,10 +10,14 @@ import {
 import { NameValidationPipe } from '../common/pipe/nameValidation.pipe';
 import { ShoppingListService } from './shopping-list.service';
 import { ShoppingList } from './shoppintg-list.entity';
+import { EventsGateway } from '../websocket/websocket.gateway';
 
 @Controller('shopping-list')
 export class ShoppingListController {
-  constructor(private readonly shoppingListService: ShoppingListService) {}
+  constructor(
+    private readonly shoppingListService: ShoppingListService,
+    private eventsGateway: EventsGateway,
+  ) {}
 
   @Post(':roomName')
   async create(
@@ -34,7 +38,8 @@ export class ShoppingListController {
     @Param('roomName', NameValidationPipe) roomName: string,
     @Body('item', NameValidationPipe) item: string,
   ) {
-    return this.shoppingListService.addItem(roomName, item);
+    await this.shoppingListService.addItem(roomName, item);
+    this.eventsGateway.notifyShoppingListUpdate(roomName);
   }
 
   @Delete(':roomName/item/:itemName')
@@ -42,7 +47,8 @@ export class ShoppingListController {
     @Param('roomName', NameValidationPipe) roomName: string,
     @Param('itemName', NameValidationPipe) itemName: string,
   ) {
-    return this.shoppingListService.deleteItem(roomName, itemName);
+    await this.shoppingListService.deleteItem(roomName, itemName);
+    this.eventsGateway.notifyShoppingListUpdate(roomName);
   }
 
   @Get(':roomName/items')

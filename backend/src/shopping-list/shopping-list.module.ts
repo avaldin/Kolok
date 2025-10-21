@@ -4,9 +4,14 @@ import { ShoppingListController } from './shopping-list.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoomModule } from '../room/room.module';
 import { ShoppingList } from './shoppintg-list.entity';
+import { WebSocketModule } from '../websocket/websocket.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ShoppingList]), RoomModule],
+  imports: [
+    TypeOrmModule.forFeature([ShoppingList]),
+    RoomModule,
+    WebSocketModule,
+  ],
   providers: [ShoppingListService],
   controllers: [ShoppingListController],
 })

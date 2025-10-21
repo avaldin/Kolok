@@ -6,7 +6,7 @@ import { validateEnv } from './config/env.config';
 
 config();
 
-const env = validateEnv(process.env);
+export const env = validateEnv(process.env);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
