@@ -1,28 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { deleteItem, getItems, postItem } from '../../../services/api'
-import { useParams } from 'next/navigation'
-import { useToast } from '../../../lib/toast'
+import React, { useCallback, useEffect, useState } from 'react'
+import { deleteItem, getItems, postItem } from '../../lib/api'
+import { useToast } from '../../lib/toast'
+import { storage } from '../../lib/storage'
+import { useShoppingListSocket } from '../../lib/hooks'
 
 
 export default function ToolPage() {
 	const { showToast } = useToast()
-
-	const params = useParams()
-
-	if (!params.roomName || typeof params.roomName !== 'string') {
-		return <div>Erreur : nom de room invalide</div>
-	}
-
 	const [items, setItems] = useState<string[]>([])
 	const [inputItem, setInputItem] = useState('')
-	const [loading, setLoading] = useState(true)
+	const [, setLoading] = useState(true)
 
-	const roomName: string = decodeURIComponent(params.roomName);
+	const roomName: string  = storage.getKolokName() ?? ''
 
-	useEffect(() => {
-		const loadItems = async () => {
+	const loadItems = useCallback(async () => {
 			try {
 				const items = await getItems(roomName)
 				setItems(items)
@@ -32,9 +25,13 @@ export default function ToolPage() {
 			} finally {
 				setLoading(false)
 			}
-		}
-		loadItems()
 	}, [roomName])
+
+	useEffect(() => {
+		loadItems()
+	}, [loadItems])
+
+	useShoppingListSocket(roomName, loadItems)
 
 	const addItem = async () => {
 		try {

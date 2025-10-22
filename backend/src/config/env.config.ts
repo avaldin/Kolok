@@ -12,6 +12,9 @@ export class EnvConfig {
 
   @IsString()
   DATABASE_URL: string;
+
+  @IsString()
+  ENVIRONMENT: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
@@ -24,6 +27,7 @@ export function validateEnv(config: Record<string, unknown>) {
   });
 
   if (errors.length > 0) {
+    console.log(errors);
     throw new Error(`Env validation failed`);
   }
   return validationConfig;

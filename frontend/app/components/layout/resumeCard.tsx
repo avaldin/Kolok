@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { Plus, X } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
-import { addTool } from '../../services/api'
+import { useEffect, useRef, useState } from 'react'
+import { addTool } from '../../lib/api'
 import { useToast } from '../ui/Toast'
 
 interface Room {
@@ -29,7 +29,6 @@ const ResumeCard = ({ name, participants, tools }: Room) => {
 
 	const availableTools = ALL_AVAILABLE_TOOLS.filter(tool => !currentTools.includes(tool))
 
-	// Fermer le menu si on clique en dehors
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -115,7 +114,7 @@ const ResumeCard = ({ name, participants, tools }: Room) => {
 					<ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 						{currentTools.map((tool, index) => (
 							<li key={index}>
-								<Link href={`/${encodeURIComponent(name)}/tools/${tool}`}>
+								<Link href={`/tools/${tool}`}>
 									<div
 										className="cursor-pointer bg-peach-yellow hover:bg-peach-yellow/90 transition text-center py-2 px-2 rounded-md border border-bistre text-bistre font-medium">
 										{tool}

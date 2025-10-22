@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { kolokNameValidator } from '../../lib/validation'
-import { createRoom, getRoom, joinRoom } from '../../services/api'
+import { createRoom, getRoom, joinRoom } from '../../lib/api'
 import { useToast } from '../ui/Toast'
 
 interface SetupKolokNameProps {

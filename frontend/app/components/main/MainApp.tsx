@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { getRoom } from '../../services/api'
+import { getRoom } from '../../lib/api'
 import { Header } from '../layout/header'
 import ResumeCard from '../layout/resumeCard'
 import { useToast } from '../ui/Toast'

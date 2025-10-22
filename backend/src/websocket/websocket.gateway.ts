@@ -1,4 +1,3 @@
-import { env } from '../main';
 import {
   ConnectedSocket,
   MessageBody,
@@ -7,6 +6,12 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { validateEnv } from '../config/env.config';
+import { config } from 'dotenv';
+
+config();
+
+const env = validateEnv(process.env);
 
 @WebSocketGateway({
   cors: { origin: env.FRONTEND_URL, credentials: true },
@@ -17,7 +22,7 @@ export class EventsGateway {
 
   constructor() {}
 
-  @SubscribeMessage('JoinShoppingList')
+  @SubscribeMessage('joinShoppingList')
   async handleJoin(
     @MessageBody() roomName: string,
     @ConnectedSocket() client: Socket,

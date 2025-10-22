@@ -3,7 +3,7 @@
 import { Home, Settings, User } from 'lucide-react'
 import { useState } from 'react'
 import { storage } from '../../lib/storage'
-import { quitRoom } from '../../services/api'
+import { quitRoom } from '../../lib/api'
 import { useToast } from './Toast'
 
 

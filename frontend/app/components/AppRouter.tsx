@@ -5,7 +5,7 @@ import { storage } from '../lib/storage'
 import SetupName from './setup/SetupName'
 import SetupKolokName from './setup/SetupKolokName'
 import MainApp from './main/MainApp'
-import { getRoom } from '../services/api'
+import { getRoom } from '../lib/api'
 import { useToast } from './ui/Toast'
 
 export default function AppRouter() {

@@ -1,5 +1,5 @@
-import { kolokNameValidator, nameValidator } from '../lib/validation'
-import { storage } from '../lib/storage'
+import { kolokNameValidator, nameValidator } from './validation'
+import { storage } from './storage'
 
 interface Room {
 	name: string,
