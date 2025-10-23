@@ -48,7 +48,7 @@ export default function MainApp({userName, kolokName, clearKolokNameAction}: Mai
 			<>
 				<main className="flex flex-col min-h-screen justify-center">
 					<Header/>
-					<div className="flex-1 flex items-center">
+					<div className="flex min-h-screen items-center justify-center">
 						<p>chargement de la koloc...</p>
 					</div>
 				</main>

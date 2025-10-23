@@ -1,6 +1,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useServiceWorker } from './lib/hooks'
+import { useToast } from './lib/toast'
 
 const AppRouter = dynamic(() => import('./components/AppRouter'), {
 	ssr: false,
@@ -14,5 +16,13 @@ const AppRouter = dynamic(() => import('./components/AppRouter'), {
 
 
 export default function Home() {
+	const {showToast} = useToast()
+
+	try { useServiceWorker() }
+	catch(e) {
+		if (e instanceof Error)
+			showToast(e.message, 'error')
+	}
+
 	return<AppRouter />
 }

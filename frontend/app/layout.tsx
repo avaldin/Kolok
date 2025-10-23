@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import React from 'react'
 import { ToastProvider } from './components/ui/Toast'
-import { useServiceWorker } from './lib/hooks'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -26,8 +25,7 @@ export default function RootLayout({
 								   }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	useServiceWorker()
-	
+
 	return (
 		<html lang="fr">
 		<body

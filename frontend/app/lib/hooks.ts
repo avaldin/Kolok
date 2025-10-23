@@ -1,8 +1,8 @@
-`use client`
+'use client'
 
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
-import { sendSubscriptionToBackend } from './api'
+import { sendSubscriptionToBackend, sendUnsubscriptionToBackend } from './api'
 import { urlBase64ToUint8Array } from './validation'
 
 export function useShoppingListSocket(roomName: string, onUpdate: () => void): void {
@@ -49,7 +49,7 @@ export function useServiceWorker() {
 		if (permission !== `granted`)
 			throw new Error(`si vous voulez etre notifier dans l'avenir, activez les notifications dans les paramettres`)
 
-		const vapidPublicKey = `A CHANGER`
+		const vapidPublicKey = `BNTiOxNslsP1rKKRvRuz8tkTXkNNF1zelRkMyxeWCnv0_rfLMVsXlZWti6SPjLTbbGZvM6semMBkV_KOCx1kkQw`
 
 		try {
 			const pushSubscription: PushSubscription = await registration.pushManager.subscribe({
@@ -65,10 +65,27 @@ export function useServiceWorker() {
 		}
 	}
 
+	const unSubscribeToNotifications = async () => {
+		if (!subscription || !registration)
+			throw new Error('Service worker pas encore enregistre')
+		try {
+			await sendUnsubscriptionToBackend(subscription)
+			const success = await registration.unregister()
+			if (success) {
+				setSubscription(null)
+			} else throw new Error('unregister failed')
+		}
+		catch (e) {
+			console.error(e)
+			throw new Error(`Erreur dans la suppression des notifications.`)
+		}
+	}
+
 	return {
 		registration,
 		isSupported,
 		subscription,
-		subscribeToNotifications
+		subscribeToNotifications,
+		unSubscribeToNotifications
 	}
 }
