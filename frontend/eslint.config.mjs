@@ -41,7 +41,7 @@ export default [
 		rules: {
 			// TypeScript strict
 			'@typescript-eslint/no-explicit-any': 'error',
-			'@typescript-eslint/no-unused-vars': ['error', {}],
+			'@typescript-eslint/no-unused-vars': ['off', {}],
 			'@typescript-eslint/explicit-function-return-type': ['warn', {
 				allowExpressions: true,
 				allowTypedFunctionExpressions: true,

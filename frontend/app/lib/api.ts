@@ -142,3 +142,18 @@ export async function addTool(roomName: string, tool: string) {
 		throw new Error(errorData.message)
 	}
 }
+
+export async function sendSubscriptionToBackend(subscription: PushSubscription) {
+	const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(subscription)
+	})
+	if (!response.ok) {
+		console.log(`error during subscription to backend`)
+		const error = await response.json()
+		throw new Error(error)
+	}
+}
