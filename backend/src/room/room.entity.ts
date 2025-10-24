@@ -9,5 +9,8 @@ export class Room {
   participants: string[];
 
   @Column('text', { array: true, default: [] })
+  notifictionsURL: string[];
+
+  @Column('text', { array: true, default: [] })
   tools: string[];
 }

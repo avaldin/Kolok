@@ -80,4 +80,25 @@ export class RoomService {
     room.tools.push(toolsName);
     return this.roomRepository.save(room);
   }
+
+  async addUrlToRoom(roomName: string, url: string) {
+    const room = await this.findByName(roomName);
+    if (room.notifictionsURL.includes(url))
+      throw new ConflictException(`this URL is already in this room`);
+    room.notifictionsURL.push(url);
+    await this.roomRepository.save(room);
+  }
+
+  async removeUrlFromRoom(roomName: string, url: string): Promise<void> {
+    const room = await this.findByName(roomName);
+    if (!room.notifictionsURL.includes(url))
+      throw new NotFoundException(`this URL isn't in this room`);
+    room.notifictionsURL.filter((u) => u !== url);
+    await this.roomRepository.save(room);
+  }
+
+  async getUrlFromRoom(roomName: string): Promise<string[]> {
+    const room = await this.findByName(roomName);
+    return room.notifictionsURL;
+  }
 }

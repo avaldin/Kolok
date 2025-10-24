@@ -57,8 +57,8 @@ export function useServiceWorker() {
 				applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
 			})
 			setSubscription(pushSubscription)
-
-			await sendSubscriptionToBackend(pushSubscription)
+			const subscriptionData = pushSubscription.toJSON()
+			await sendSubscriptionToBackend(subscriptionData)
 		} catch (e) {
 			console.error(e)
 			throw new Error(`Erreur dans l'activation des notifications.`)

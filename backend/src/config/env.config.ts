@@ -15,6 +15,12 @@ export class EnvConfig {
 
   @IsString()
   ENVIRONMENT: string;
+
+  @IsString()
+  VAPID_KEY_PUBLIC: string;
+
+  @IsString()
+  VAPID_KEY_PRIVATE: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

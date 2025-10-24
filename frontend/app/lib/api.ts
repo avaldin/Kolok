@@ -144,13 +144,13 @@ export async function addTool(roomName: string, tool: string) {
 }
 
 export async function sendSubscriptionToBackend(subscription: PushSubscription) {
-	console.log(subscription)
+	console.log(subscription.options)
 	const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: JSON.stringify(subscription)
+		body: JSON.stringify({URL: subscription})
 	})
 	if (!response.ok) {
 		console.log(`error during subscription to backend`)
@@ -161,12 +161,13 @@ export async function sendSubscriptionToBackend(subscription: PushSubscription) 
 
 export async function sendUnsubscriptionToBackend(subscription: PushSubscription) {
 	console.log(subscription)
+
 	const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications`, {
 		method: 'DELETE',
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: JSON.stringify(subscription)
+		body: JSON.stringify({URL: subscription})
 	})
 	if (!response.ok) {
 		console.log(`error during subscription to backend`)
