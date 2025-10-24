@@ -7,6 +7,9 @@ import { RoomModule } from './room/room.module';
 import { ShoppingListModule } from './shopping-list/shopping-list.module';
 import { validateEnv } from './config/env.config';
 import { config } from 'dotenv';
+import { UserModule } from './user/user.module';
+import { MailModule } from './mail/mail.module';
+import { UserModule } from './user/user.module';
 
 config();
 
@@ -27,6 +30,8 @@ const envConfig = validateEnv(process.env);
     }),
     RoomModule,
     ShoppingListModule,
+    UserModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

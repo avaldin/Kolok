@@ -5,9 +5,9 @@ export class Room {
   @PrimaryColumn()
   name: string;
 
-  @Column({ array: true, default: [] })
+  @Column('text', { array: true, default: [] })
   participants: string[];
 
-  @Column({ array: true, default: [] })
+  @Column('text', { array: true, default: [] })
   tools: string[];
 }
