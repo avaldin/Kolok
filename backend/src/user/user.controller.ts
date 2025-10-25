@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { LoginUserDto } from './dto/login.dto';
 
 @Controller('user')
 export class UserController {
@@ -12,25 +13,20 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Post('login')
+  login(@Body() loginUserDto: LoginUserDto) {
+    return this.userService.login(loginUserDto);
+  }
+
   @Post('verify-email')
-  verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    return this.userService.verifyEmail(verifyEmailDto);
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    await this.userService.verifyEmail(verifyEmailDto);
   }
 
   @Post('resend-code')
-  resendCode(@Body('email') email: string) {
+  resendCode(@Body() email: string) {
     return this.userService.resendVerificationCode(email);
   }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.userService.findOneById(id);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.userService.remove(+id);
-  // }
 
   @Post('join-room')
   async joinRoom(@Body('id') id: string, @Body('roomName') roomName: string) {

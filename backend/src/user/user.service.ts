@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { MailService } from '../mail/mail.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { LoginUserDto } from './dto/login.dto';
 
 @Injectable()
 export class UserService {
@@ -52,15 +53,33 @@ export class UserService {
     return user.id;
   }
 
-  // async connect() {
-  //
-  // }
+  async login(loginUserDto: LoginUserDto) {
+    const existingUser = await this.userRepository.findOne({
+      where: { email: loginUserDto.email },
+    });
+    if (!existingUser)
+      throw new BadRequestException(
+        `aucun compte enregistre avec cette adresse.`,
+      );
+    const verificationCode = this.generateVerificationCode();
+    const verificationCodeExpires = new Date();
+    verificationCodeExpires.setMinutes(
+      verificationCodeExpires.getMinutes() + 15,
+    ); // attention si getMinute + 15 > 59
+
+    await this.userRepository.save(existingUser);
+
+    await this.mailService.sendVerificationEmail(
+      existingUser.email,
+      verificationCode,
+    );
+  }
 
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     const user = await this.findByEmail(verifyEmailDto.email);
 
-    if (user.isEmailVerified || !user.verificationCodeExpires) {
-      throw new BadRequestException('Email déjà vérifié');
+    if (!user.verificationCodeExpires) {
+      throw new BadRequestException(`l'email n'a pas ete envoye`);
     }
 
     if (new Date() > user.verificationCodeExpires) {
@@ -76,17 +95,12 @@ export class UserService {
     user.verificationCodeExpires = null;
 
     await this.userRepository.save(user);
-    //jwt
+    return user.id;
   }
 
   async resendVerificationCode(email: string) {
     const user = await this.findByEmail(email);
 
-    if (user.isEmailVerified) {
-      throw new BadRequestException('Email déjà vérifié');
-    }
-
-    // Générer un nouveau code
     const verificationCode = this.generateVerificationCode();
     const verificationCodeExpires = new Date();
     verificationCodeExpires.setMinutes(
@@ -98,7 +112,6 @@ export class UserService {
 
     await this.userRepository.save(user);
     await this.mailService.sendVerificationEmail(user.email, verificationCode);
-    //jwt
   }
 
   // findAll() {
