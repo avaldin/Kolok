@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Room } from '../room/room.entity';
 
 @Entity()
 export class User {
@@ -20,6 +21,10 @@ export class User {
   @Column({ nullable: true })
   verificationCodeExpires: Date | null;
 
-  @Column()
-  room: string;
+  @Column({ nullable: true })
+  @ManyToOne(() => Room, (room) => room.users)
+  room: Room;
+
+  @Column({ nullable: true })
+  roomName: string | null;
 }

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -53,13 +57,7 @@ export class UserService {
   // }
 
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
-    const user = await this.userRepository.findOne({
-      where: { email: verifyEmailDto.email },
-    });
-
-    if (!user) {
-      throw new BadRequestException('Utilisateur non trouvé');
-    }
+    const user = await this.findByEmail(verifyEmailDto.email);
 
     if (user.isEmailVerified || !user.verificationCodeExpires) {
       throw new BadRequestException('Email déjà vérifié');
@@ -82,11 +80,7 @@ export class UserService {
   }
 
   async resendVerificationCode(email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
-
-    if (!user) {
-      throw new BadRequestException('Utilisateur non trouvé');
-    }
+    const user = await this.findByEmail(email);
 
     if (user.isEmailVerified) {
       throw new BadRequestException('Email déjà vérifié');
@@ -107,15 +101,47 @@ export class UserService {
     //jwt
   }
 
-  findAll() {
-    return `This action returns all user`;
+  // findAll() {
+  //   return `This action returns all user`;
+  // }
+
+  async findOneById(id: string) {
+    const user = await this.userRepository.findOne({ where: { id: id } });
+    if (!user) {
+      throw new BadRequestException('Utilisateur non trouvé');
+    }
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findByEmail(email: string) {
+    const user = await this.userRepository.findOne({ where: { email: email } });
+    if (!user) {
+      throw new BadRequestException('Utilisateur non trouvé');
+    }
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async getRoom(userId: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('Utilisateur non trouvé');
+    }
+    return user.roomName;
+  }
+
+  async joinRoom(roomName: string, userId: string) {
+    const user = await this.findOneById(userId);
+    if (user.roomName != null)
+      throw new ConflictException(`vous etes deja dans une room`);
+    user.roomName = roomName;
+    await this.userRepository.save(user);
+  }
+
+  async leaveRoom(userId: string) {
+    const user = await this.findOneById(userId);
+    if (user.roomName === null)
+      throw new ConflictException(`vous n'etes pas dans une room`);
+    user.roomName = null;
+    await this.userRepository.save(user);
   }
 }

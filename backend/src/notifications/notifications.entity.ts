@@ -1,13 +1,21 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { User } from '../user/user.entity';
 
 @Entity()
-export class Room {
+export class Notifications {
   @PrimaryColumn()
-  name: string;
+  userId: string;
 
-  @Column('text', { array: true, default: [] })
-  participants: string[];
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 
-  @Column('text', { array: true, default: [] })
-  tools: string[];
+  @Column({ nullable: true })
+  url: string | null;
+
+  @Column({ nullable: true })
+  encryptionKey: string | null;
+
+  @Column({ nullable: true })
+  authKey: string | null;
 }

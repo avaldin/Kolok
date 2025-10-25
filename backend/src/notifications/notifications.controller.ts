@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Post } from '@nestjs/common';
 import { NameValidationPipe } from '../common/pipe/nameValidation.pipe';
 import { NotificationsService } from './notifications.service';
+import { SubscriptionDto } from './dto/subscribtion';
 
 @Controller('notifications')
 export class NotificationsController {
@@ -8,17 +9,14 @@ export class NotificationsController {
 
   @Post()
   async subscribe(
-    @Body('roomName', NameValidationPipe) roomName: string,
-    @Body(`URL`) Url: string,
+    @Body('userId', NameValidationPipe) userId: string,
+    @Body() subscribtionDto: SubscriptionDto,
   ) {
-    await this.notificationsService.addUrl(Url, roomName);
+    await this.notificationsService.subscribe(subscribtionDto, userId);
   }
 
   @Delete()
-  async unSubscribe(
-    @Body('roomName', NameValidationPipe) roomName: string,
-    @Body(`URL`) Url: string,
-  ) {
-    await this.notificationsService.removeUrl(Url, roomName);
+  async unSubscribe(@Body('roomName', NameValidationPipe) roomName: string) {
+    await this.notificationsService.unSubscribe(roomName);
   }
 }

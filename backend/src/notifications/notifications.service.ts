@@ -1,35 +1,40 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { RoomService } from '../room/room.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { Notifications } from './notifications.entity';
+import { SubscriptionDto } from './dto/subscribtion';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private roomService: RoomService) {}
+  constructor(private notificationsRepository: Repository<Notifications>) {}
 
-  async addUrl(url: string, roomName: string) {
-    try {
-      await this.roomService.addUrlToRoom(roomName, url);
-    } catch (e) {
-      if (e instanceof ConflictException) {
-        console.log(e.message);
-        throw new ConflictException(`vous avez deja active les notifications.`);
-      }
-      throw new Error(`internal error system`);
-    }
+  async subscribe(subscribtionDto: SubscriptionDto, userId: string) {
+    const userNotification = await this.notificationsRepository.findOne({
+      where: { userId },
+    });
+    if (!userNotification)
+      throw new NotFoundException(`this user doesn't exist`);
+    userNotification.url = subscribtionDto.url;
+    userNotification.authKey = subscribtionDto.keys.auth;
+    userNotification.encryptionKey = subscribtionDto.keys.p256dh;
   }
 
-  async removeUrl(url: string, roomName: string) {
-    try {
-      await this.roomService.removeUrlFromRoom(roomName, url);
-    } catch (e) {
-      if (e instanceof NotFoundException) {
-        console.log(e.message);
-        throw new NotFoundException(`Les notifications ne sont pas active`);
-      }
-      throw new Error(`internal error system`);
-    }
+  async unSubscribe(userId: string) {
+    const userNotification = await this.notificationsRepository.findOne({
+      where: { userId: userId },
+    });
+    if (!userNotification)
+      throw new NotFoundException(`this user doesn't exist`);
+    userNotification.url = null;
+    userNotification.authKey = null;
+    userNotification.encryptionKey = null;
+  }
+
+  async getUserNotificationsData(userId: string) {
+    const userNotification = await this.notificationsRepository.findOne({
+      where: { userId },
+    });
+    if (!userNotification)
+      throw new NotFoundException(`this user doesn't exist`);
+    return userNotification;
   }
 }

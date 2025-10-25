@@ -6,12 +6,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Room } from './room.entity';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class RoomService {
   constructor(
     @InjectRepository(Room)
     private roomRepository: Repository<Room>,
+    private userService: UserService,
   ) {}
 
   async createRoom(name: string): Promise<Room> {
@@ -33,27 +35,17 @@ export class RoomService {
     return roomByName;
   }
 
-  async addParticipant(roomName: string, participantName: string) {
-    const room = await this.findByName(roomName);
-    if (room.participants.includes(participantName))
-      throw new ConflictException(
-        `${participantName} est deja dans cette room`,
-      );
-    room.participants.push(participantName);
-    await this.roomRepository.save(room);
-  }
+  async findRoomByUserId(userId: string): Promise<Room> {
+    const roomName = await this.userService.getRoom(userId);
+    if (!roomName)
+      throw new NotFoundException(`cet user n'est dans aucune room`);
+    const room = await this.roomRepository.findOne({
+      where: { name: roomName },
+    });
 
-  async removeParticipant(
-    roomName: string,
-    participantName: string,
-  ): Promise<void> {
-    const room = await this.findByName(roomName);
-    if (!room.participants.includes(participantName))
-      throw new NotFoundException(
-        `${participantName} n'est pas dans cette room`,
-      );
-    room.participants.splice(room.participants.indexOf(participantName), 1);
-    await this.roomRepository.save(room);
+    if (!room)
+      throw new Error(`internal system error: RoomDb and UserDb dismatch`);
+    return room;
   }
 
   async getTools(name: string): Promise<string[]> {
@@ -79,26 +71,5 @@ export class RoomService {
       );
     room.tools.push(toolsName);
     return this.roomRepository.save(room);
-  }
-
-  async addUrlToRoom(roomName: string, url: string) {
-    const room = await this.findByName(roomName);
-    if (room.notifictionsURL.includes(url))
-      throw new ConflictException(`this URL is already in this room`);
-    room.notifictionsURL.push(url);
-    await this.roomRepository.save(room);
-  }
-
-  async removeUrlFromRoom(roomName: string, url: string): Promise<void> {
-    const room = await this.findByName(roomName);
-    if (!room.notifictionsURL.includes(url))
-      throw new NotFoundException(`this URL isn't in this room`);
-    room.notifictionsURL.filter((u) => u !== url);
-    await this.roomRepository.save(room);
-  }
-
-  async getUrlFromRoom(roomName: string): Promise<string[]> {
-    const room = await this.findByName(roomName);
-    return room.notifictionsURL;
   }
 }
