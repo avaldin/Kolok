@@ -35,6 +35,7 @@ export default function AppRouter() {
 
     const loadRoom = async () => {
       try {
+        console.log(userId);
         const userRoom = await getRoomByUserId(userId);
         if (userRoom) {
           setRoom(userRoom);
@@ -48,7 +49,7 @@ export default function AppRouter() {
     };
 
     loadRoom();
-  }, [userId, showToast]);
+  }, [userId]);
 
   // Callback après authentification réussie
   const handleAuthSuccess = (id: string) => {

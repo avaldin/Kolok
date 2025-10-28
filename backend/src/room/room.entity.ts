@@ -14,9 +14,7 @@ export class Room {
   tools: string[];
 
   idArrayToNameArray(): string[] {
-    const nameArray: string[] = [];
-
-    for (const user of this.users) nameArray.push(user.name);
+    const nameArray: string[] = this.users.map((user) => user.name);
     return nameArray;
   }
 

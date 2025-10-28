@@ -100,7 +100,7 @@ export async function joinRoom(
   const response = await fetch(`${API_URL}/user/join-room`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: userId, roomName }),
+    body: JSON.stringify({ id: userId, roomName: roomName }),
   });
 
   if (!response.ok) {

@@ -88,7 +88,9 @@ export default function SetupKolokName({
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyPress={(e) => {
+                handleKeyPress(e);
+              }}
               placeholder="Nom de la colocation..."
               className="w-full px-4 py-3 rounded-md border-2 border-bistre bg-cadet-gray text-bistre placeholder-bistre/60 focus:outline-none focus:ring-2 focus:ring-atomic-tangerine"
             />
@@ -99,7 +101,9 @@ export default function SetupKolokName({
 
           <div className="flex gap-3">
             <button
-              onClick={void handleJoin}
+              onClick={() => {
+                handleJoin();
+              }}
               disabled={!kolokNameValidator(input) || loading}
               className="flex-1 px-6 py-3 rounded-md border-2 border-bistre bg-atomic-tangerine text-bistre font-semibold hover:bg-atomic-tangerine/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -107,7 +111,9 @@ export default function SetupKolokName({
             </button>
 
             <button
-              onClick={void handleCreate()}
+              onClick={() => {
+                handleCreate();
+              }}
               disabled={!kolokNameValidator(input) || loading}
               className="flex-1 px-6 py-3 rounded-md border-2 border-bistre bg-atomic-tangerine text-bistre font-semibold hover:bg-atomic-tangerine/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >

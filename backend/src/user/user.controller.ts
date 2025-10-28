@@ -20,17 +20,19 @@ export class UserController {
 
   @Post('verify-email')
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    await this.userService.verifyEmail(verifyEmailDto);
+    const id = await this.userService.verifyEmail(verifyEmailDto);
+    return { id: id };
   }
 
   @Post('resend-code')
-  resendCode(@Body() email: string) {
+  resendCode(@Body('email') email: string) {
+    console.log(email);
     return this.userService.resendVerificationCode(email);
   }
 
   @Post('join-room')
   async joinRoom(@Body('id') id: string, @Body('roomName') roomName: string) {
-    await this.userService.joinRoom(id, roomName);
+    await this.userService.joinRoom(roomName, id);
   }
 
   @Delete('leave-room')

@@ -67,6 +67,9 @@ export class UserService {
       verificationCodeExpires.getMinutes() + 15,
     ); // attention si getMinute + 15 > 59
 
+    existingUser.verificationCode = verificationCode;
+    existingUser.verificationCodeExpires = verificationCodeExpires;
+
     await this.userRepository.save(existingUser);
 
     await this.mailService.sendVerificationEmail(
@@ -77,7 +80,6 @@ export class UserService {
 
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     const user = await this.findByEmail(verifyEmailDto.email);
-
     if (!user.verificationCodeExpires) {
       throw new BadRequestException(`l'email n'a pas ete envoye`);
     }
@@ -99,7 +101,9 @@ export class UserService {
   }
 
   async resendVerificationCode(email: string) {
+    console.log(`Resend verification code a ${email}`);
     const user = await this.findByEmail(email);
+    console.log('Resend verification code2');
 
     const verificationCode = this.generateVerificationCode();
     const verificationCodeExpires = new Date();
