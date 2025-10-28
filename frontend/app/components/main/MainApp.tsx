@@ -1,10 +1,7 @@
 'use client'
 
-import React, { useEffect } from 'react'
-import { getRoom } from '../../lib/api'
 import { Header } from '../layout/header'
 import ResumeCard from '../layout/resumeCard'
-import { useToast } from '../ui/Toast'
 
 interface Room {
 	name: string,
@@ -13,54 +10,12 @@ interface Room {
 }
 
 interface MainAppProps {
-	userName: string,
-	kolokName: string,
-	clearKolokNameAction: () => void
+	room: Room,
+	userId: string,
+	onLeaveRoom: () => void
 }
 
-export default function MainApp({userName, kolokName, clearKolokNameAction}: MainAppProps) {
-	const [room, setRoom] = React.useState<Room | null>()
-	const [loading, setLoading] = React.useState<boolean>(true)
-
-	const { showToast } = useToast()
-
-	useEffect(() => {
-		if (!userName || !kolokName) return
-
-		const loadRoom = async () => {
-			setLoading(true)
-			try {
-				const room: Room = await getRoom(kolokName)
-				setRoom(room)
-			} catch (e) {
-				if (e instanceof Error)
-					showToast(e.message, 'error')
-			} finally {
-				setLoading(false)
-			}
-		}
-		loadRoom()
-	}, [userName, kolokName])
-
-
-	if (loading) {
-		return (
-			<>
-				<main className="flex flex-col min-h-screen justify-center">
-					<Header/>
-					<div className="flex min-h-screen items-center justify-center">
-						<p>chargement de la koloc...</p>
-					</div>
-				</main>
-			</>
-		)
-	}
-
-	if (!room) {
-		clearKolokNameAction()
-		return
-	}
-
+export default function MainApp({room, userId, onLeaveRoom}: MainAppProps) {
 	return (
 		<>
 			<main className="flex flex-col min-h-screen justify-center">

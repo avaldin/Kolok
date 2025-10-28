@@ -5,36 +5,63 @@ import { kolokNameValidator } from '../../lib/validation'
 import { createRoom, getRoom, joinRoom } from '../../lib/api'
 import { useToast } from '../ui/Toast'
 
-interface SetupKolokNameProps {
-	onKolokNameSet: (name: string) => void
+interface Room {
+	name: string
+	participants: string[]
+	tools: string[]
 }
 
-export default function SetupKolokName({onKolokNameSet}: SetupKolokNameProps) {
+interface SetupKolokNameProps {
+	userId: string
+	onRoomSet: (room: Room) => void
+}
+
+export default function SetupKolokName({userId, onRoomSet}: SetupKolokNameProps) {
 	const [input, setInput] = useState('')
 	const [error, setError] = useState('')
+	const [loading, setLoading] = useState(false)
 	const { showToast } = useToast()
 
 	const handleJoin = async () => {
+		setLoading(true)
 		try {
-			await getRoom(input.trim())
-			onKolokNameSet(input.trim())
-			await joinRoom(input.trim())
+			// Rejoindre la room (backend vérifie si elle existe)
+			await joinRoom(userId, input.trim())
+
+			// Récupérer les données complètes de la room
+			const roomData = await getRoom(input.trim())
+
+			// Passer les données au callback
+			onRoomSet(roomData)
 		} catch (e) {
 			if (e instanceof Error)
 				showToast(e.message, 'error')
 			setInput('')
+		} finally {
+			setLoading(false)
 		}
 	}
 
 	const handleCreate = async () => {
+		setLoading(true)
 		try {
+			// Créer la room
 			await createRoom(input.trim())
-			await joinRoom(input.trim())
-			onKolokNameSet(input.trim())
+
+			// Rejoindre la room créée
+			await joinRoom(userId, input.trim())
+
+			// Récupérer les données complètes de la room
+			const roomData = await getRoom(input.trim())
+
+			// Passer les données au callback
+			onRoomSet(roomData)
 		} catch (e) {
 			if (e instanceof Error)
 				showToast(e.message, 'error')
 			setInput('')
+		} finally {
+			setLoading(false)
 		}
 	}
 
@@ -74,18 +101,18 @@ export default function SetupKolokName({onKolokNameSet}: SetupKolokNameProps) {
 					<div className="flex gap-3">
 						<button
 							onClick={handleJoin}
-							disabled={!kolokNameValidator(input)}
+							disabled={!kolokNameValidator(input) || loading}
 							className="flex-1 px-6 py-3 rounded-md border-2 border-bistre bg-atomic-tangerine text-bistre font-semibold hover:bg-atomic-tangerine/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
 						>
-							Rejoindre
+							{loading ? 'Chargement...' : 'Rejoindre'}
 						</button>
 
 						<button
 							onClick={handleCreate}
-							disabled={!kolokNameValidator(input)}
+							disabled={!kolokNameValidator(input) || loading}
 							className="flex-1 px-6 py-3 rounded-md border-2 border-bistre bg-atomic-tangerine text-bistre font-semibold hover:bg-atomic-tangerine/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
 						>
-							Créer
+							{loading ? 'Chargement...' : 'Créer'}
 						</button>
 					</div>
 

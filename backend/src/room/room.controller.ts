@@ -26,9 +26,9 @@ export class RoomController {
     return this.roomService.findByName(name);
   }
 
-  @Get()
-  async getRoomByUserId(@Param('id') id: string): Promise<Room> {
-    return this.roomService.findRoomByUserId(id);
+  @Get('byUserId/:userId')
+  async getRoomByUserId(@Param('userId') userId: string): Promise<Room> {
+    return this.roomService.findRoomByUserId(userId);
   }
 
   @Get(':name/tools')
