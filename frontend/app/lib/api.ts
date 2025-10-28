@@ -1,5 +1,4 @@
 import { kolokNameValidator, nameValidator } from './validation';
-import { storage } from './storage';
 
 interface Room {
   name: string;
@@ -14,9 +13,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
  * @param userId - ID de l'utilisateur
  * @returns Room complète ou null si l'utilisateur n'a pas de room
  */
-export async function getRoomByUserId(
-  userId: string,
-): Promise<Room | null> {
+export async function getRoomByUserId(userId: string): Promise<Room | null> {
   const response = await fetch(`${API_URL}/room/byUserId/${userId}`);
 
   if (response.status === 404) {
@@ -30,8 +27,8 @@ export async function getRoomByUserId(
       errorData.message || 'Erreur lors de la récupération de la room',
     );
   }
-
-  return await response.json();
+  const room = (await response.json()) as Room;
+  return room;
 }
 
 export async function getRoom(roomName: string): Promise<Room> {
@@ -49,10 +46,11 @@ export async function getRoom(roomName: string): Promise<Room> {
     }
     throw new Error(`Erreur ${response.status}`);
   }
-  return response.json();
+  const room = (await response.json()) as Room;
+  return room;
 }
 
-export async function createRoom(roomName: string): Promise<Room> {
+export async function createRoom(roomName: string) {
   if (!kolokNameValidator(roomName))
     throw new Error(
       `le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`,
@@ -69,7 +67,6 @@ export async function createRoom(roomName: string): Promise<Room> {
     }
     throw new Error(`Erreur ${response.status}`);
   }
-  return response.json();
 }
 
 export async function postItem(roomName: string, item: string) {
@@ -127,7 +124,8 @@ export async function getItems(roomName: string) {
     }
     throw new Error(`Erreur ${response.status}`);
   }
-  return response.json() as Promise<{ items: string[] }>;
+  const items = (await response.json()) as string[];
+  return items;
 }
 
 export async function deleteItem(roomName: string, item: string) {
@@ -151,31 +149,20 @@ export async function deleteItem(roomName: string, item: string) {
   }
 }
 
-export async function quitRoom(roomName: string): Promise<void> {
-  if (!roomName || !kolokNameValidator(roomName))
-    throw new Error(
-      `le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`,
-    );
-  const username = storage.getUserName();
-  if (!username || !nameValidator(username))
-    throw new Error(
-      `le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 20 caracteres`,
-    );
-  const response = await fetch(
-    `${API_URL}/room/${encodeURIComponent(roomName)}/participant`,
-    {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ participantName: username }),
-    },
-  );
+// TODO: Cette fonction nécessite une refonte pour utiliser userId au lieu de userName
+// depuis le localStorage. L'endpoint backend attend le participantName mais on n'a plus
+// accès au userName côté frontend. Solution possible: utiliser DELETE /user/leave-room
+// avec userId uniquement
+export async function quitRoom(userId: string): Promise<void> {
+  const response = await fetch(`${API_URL}/user/leave-room`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: userId }),
+  });
+
   if (!response.ok) {
-    if (response.status === 409) {
-      const errorData = (await response.json()) as { message: string };
-      console.log(errorData);
-      throw new Error(errorData.message);
-    }
-    throw new Error(`Erreur ${response.status}`);
+    const errorData = (await response.json()) as { message: string };
+    throw new Error(errorData.message || 'Erreur lors de la déconnexion');
   }
 }
 
@@ -215,7 +202,7 @@ export async function sendSubscriptionToBackend(
     console.log(`error during subscription to backend`);
 
     const error = (await response.json()) as { message: string };
-    throw new Error(error);
+    throw new Error(error.message);
   }
 }
 
@@ -237,7 +224,7 @@ export async function sendUnsubscriptionToBackend(
   if (!response.ok) {
     console.log(`error during subscription to backend`);
     const error = (await response.json()) as { message: string };
-    throw new Error(error);
+    throw new Error(error.message);
   }
 }
 
@@ -267,10 +254,7 @@ export async function loginUser(email: string): Promise<void> {
   }
 }
 
-export async function verifyEmail(
-  email: string,
-  code: string,
-): Promise<{ id: string; name: string }> {
+export async function verifyEmail(email: string, code: string) {
   const response = await fetch(`${API_URL}/user/verify-email`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -280,7 +264,7 @@ export async function verifyEmail(
     const errorData = (await response.json()) as { message: string };
     throw new Error(errorData.message || 'Code invalide');
   }
-  return response.json();
+  const { userId } = (await response.json()) as { userId: string };
 }
 
 export async function resendVerificationCode(email: string): Promise<void> {

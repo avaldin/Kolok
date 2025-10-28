@@ -3,28 +3,27 @@ import { Room } from '../room/room.entity';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   email: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isEmailVerified: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   verificationCode: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   verificationCodeExpires: Date | null;
 
-  @Column({ nullable: true })
-  @ManyToOne(() => Room, (room) => room.users)
+  @ManyToOne(() => Room, (room) => room.users, { nullable: true })
   room: Room;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   roomName: string | null;
 }

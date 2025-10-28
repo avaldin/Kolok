@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { NameValidationPipe } from '../common/pipe/nameValidation.pipe';
 import { Room } from './room.entity';
+import { RoomDto } from './dto/room.dto';
 
 @Controller('room')
 export class RoomController {
@@ -14,20 +15,15 @@ export class RoomController {
     return this.roomService.createRoom(name);
   }
 
-  @Get()
-  async getAllRoom(): Promise<Room[]> {
-    return this.roomService.findAll();
-  }
-
   @Get(':name')
   async getRoomByName(
     @Param('name', NameValidationPipe) name: string,
-  ): Promise<Room> {
+  ): Promise<RoomDto> {
     return this.roomService.findByName(name);
   }
 
   @Get('byUserId/:userId')
-  async getRoomByUserId(@Param('userId') userId: string): Promise<Room> {
+  async getRoomByUserId(@Param('userId') userId: string): Promise<RoomDto> {
     return this.roomService.findRoomByUserId(userId);
   }
 

@@ -10,12 +10,12 @@ export class Notifications {
   @JoinColumn()
   user: User;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   url: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   encryptionKey: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   authKey: string | null;
 }

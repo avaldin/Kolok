@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Room } from './room.entity';
 import { UserService } from '../user/user.service';
+import { RoomDto } from './dto/room.dto';
 
 @Injectable()
 export class RoomService {
@@ -24,18 +25,14 @@ export class RoomService {
     return this.roomRepository.save(room);
   }
 
-  async findAll(): Promise<Room[]> {
-    return this.roomRepository.find();
-  }
-
-  async findByName(name: string): Promise<Room> {
+  async findByName(name: string): Promise<RoomDto> {
     const roomByName = await this.roomRepository.findOne({ where: { name } });
     if (!roomByName)
       throw new NotFoundException(`la room ${name} n'existe pas`);
-    return roomByName;
+    return roomByName.roomInformation();
   }
 
-  async findRoomByUserId(userId: string): Promise<Room> {
+  async findRoomByUserId(userId: string): Promise<RoomDto> {
     const roomName = await this.userService.getRoom(userId);
     if (!roomName)
       throw new NotFoundException(`cet user n'est dans aucune room`);
@@ -45,7 +42,7 @@ export class RoomService {
 
     if (!room)
       throw new Error(`internal system error: RoomDb and UserDb dismatch`);
-    return room;
+    return room.roomInformation();
   }
 
   async getTools(name: string): Promise<string[]> {

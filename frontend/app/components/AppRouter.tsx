@@ -20,38 +20,35 @@ export default function AppRouter() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { showToast } = useToast();
 
-  // Initialisation: charger userId et room associée
+  // Premier useEffect: initialiser userId depuis storage
   useEffect(() => {
-    const initialize = async () => {
+    const storedUserId = storage.getUserId();
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+    setIsLoading(false);
+  }, []);
+
+  // Deuxième useEffect: charger la room quand userId change
+  useEffect(() => {
+    if (!userId) return;
+
+    const loadRoom = async () => {
       try {
-        const storedUserId = storage.getUserId();
-
-        if (!storedUserId) {
-          setIsLoading(false);
-          return;
+        const userRoom = await getRoomByUserId(userId);
+        if (userRoom) {
+          setRoom(userRoom);
         }
-
-        setUserId(storedUserId);
-
-        const userRoom = await getRoomByUserId(storedUserId);
-
-        if (!userRoom) {
-          setIsLoading(false);
-          return;
-        }
-        setRoom(userRoom);
       } catch (error) {
-        console.error('Erreur initialisation:', error);
+        console.error('Erreur chargement room:', error);
         if (error instanceof Error) {
           showToast(error.message, 'error');
         }
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    initialize();
-  }, [showToast]);
+    loadRoom();
+  }, [userId, showToast]);
 
   // Callback après authentification réussie
   const handleAuthSuccess = (id: string) => {

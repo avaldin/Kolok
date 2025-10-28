@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { sendSubscriptionToBackend, sendUnsubscriptionToBackend } from './api';
+import { sendUnsubscriptionToBackend } from './api';
 import { urlBase64ToUint8Array } from './validation';
 
 export function useShoppingListSocket(
@@ -40,7 +40,7 @@ export function useServiceWorker() {
       .register('/service-worker.js')
       .then((registration) => setRegistration(registration))
       .catch((err) => {
-        throw new Error(err.message);
+        throw new Error(err);
       });
   }, []);
 
@@ -63,8 +63,8 @@ export function useServiceWorker() {
           applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
         });
       setSubscription(pushSubscription);
-      const subscriptionData = pushSubscription.toJSON();
-      await sendSubscriptionToBackend(subscriptionData);
+      // const subscriptionData = pushSubscription.toJSON();
+      // await sendSubscriptionToBackend(subscriptionData);
     } catch (e) {
       console.error(e);
       throw new Error(`Erreur dans l'activation des notifications.`);

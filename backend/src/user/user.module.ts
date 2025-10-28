@@ -6,6 +6,7 @@ import { User } from './user.entity';
 import { MailModule } from '../mail/mail.module';
 
 @Module({
+  exports: [UserService],
   imports: [TypeOrmModule.forFeature([User]), MailModule],
   controllers: [UserController],
   providers: [UserService],
