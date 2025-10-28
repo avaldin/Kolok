@@ -1,38 +1,46 @@
-
 export const STORAGE_KEYS = {
-	USER_NAME: 'userName',
-	KOLOK_NAME: 'kolokName',
-}
+  USER_ID: 'userId',
+  USER_NAME: 'userName',
+  KOLOK_NAME: 'kolokName',
+};
 
 export const storage = {
-	getUserName: (): string | null => {
-		if (typeof window === 'undefined') return null
-		return localStorage.getItem(STORAGE_KEYS.USER_NAME)
-	},
+  getUserId: (): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(STORAGE_KEYS.USER_NAME);
+  },
+  setUserId: (id: string): void => {
+    localStorage.setItem(STORAGE_KEYS.USER_ID, id);
+  },
 
-	setUserName: (name: string): void => {
-		localStorage.setItem(STORAGE_KEYS.USER_NAME, name)
-	},
+  getUserName: (): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(STORAGE_KEYS.USER_NAME);
+  },
 
-	getKolokName: () : string | null => {
-		if (typeof window === 'undefined') return null
-		return localStorage.getItem(STORAGE_KEYS.KOLOK_NAME)
-	},
+  setUserName: (name: string): void => {
+    localStorage.setItem(STORAGE_KEYS.USER_NAME, name);
+  },
 
-	setKolokName: (kolokName: string): void => {
-		localStorage.setItem(STORAGE_KEYS.KOLOK_NAME, kolokName)
-	},
+  getKolokName: (): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(STORAGE_KEYS.KOLOK_NAME);
+  },
 
-	clearUserName: (): void => {
-		localStorage.removeItem(STORAGE_KEYS.USER_NAME)
-	},
+  setKolokName: (kolokName: string): void => {
+    localStorage.setItem(STORAGE_KEYS.KOLOK_NAME, kolokName);
+  },
 
-	clearKolokName: (): void => {
-		localStorage.removeItem(STORAGE_KEYS.KOLOK_NAME)
-	},
+  clearUserName: (): void => {
+    localStorage.removeItem(STORAGE_KEYS.USER_NAME);
+  },
 
-	clearAll: (): void => {
-		localStorage.removeItem(STORAGE_KEYS.KOLOK_NAME)
-		localStorage.removeItem(STORAGE_KEYS.USER_NAME)
-	}
-}
+  clearKolokName: (): void => {
+    localStorage.removeItem(STORAGE_KEYS.KOLOK_NAME);
+  },
+
+  clearAll: (): void => {
+    localStorage.removeItem(STORAGE_KEYS.KOLOK_NAME);
+    localStorage.removeItem(STORAGE_KEYS.USER_NAME);
+  },
+};

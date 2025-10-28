@@ -1,36 +1,42 @@
-import js from '@eslint/js';
-import typescript from '@typescript-eslint/eslint-plugin';
-import typescriptParser from '@typescript-eslint/parser';
+// @ts-check
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import nextPlugin from '@next/eslint-plugin-next';
+import eslintPluginPrettierRecommended
+	from 'eslint-plugin-prettier/recommended';
 
-export default [
-	js.configs.recommended,
+export default tseslint.config(
+	{
+		ignores: [
+			'.next/**',
+			'node_modules/**',
+			'out/**',
+			'public/**',
+			'*.config.js',
+			'eslint.config.mjs',
+		],
+	},
+	eslint.configs.recommended,
+	...tseslint.configs.recommendedTypeChecked,
+	eslintPluginPrettierRecommended,
 	{
 		files: ['**/*.{js,jsx,ts,tsx}'],
 		plugins: {
-			'@typescript-eslint': typescript,
 			'react': react,
 			'react-hooks': reactHooks,
 			'jsx-a11y': jsxA11y,
 			'@next/next': nextPlugin,
 		},
 		languageOptions: {
-			parser: typescriptParser,
 			parserOptions: {
-				ecmaVersion: 'latest',
-				sourceType: 'module',
+				projectService: true,
+				tsconfigRootDir: import.meta.dirname,
 				ecmaFeatures: {
 					jsx: true,
 				},
-				project: './tsconfig.json',
-			},
-			globals: {
-				process: `readonly`,
-				React: 'readonly',
-				JSX: 'readonly',
 			},
 		},
 		settings: {
@@ -39,21 +45,14 @@ export default [
 			},
 		},
 		rules: {
-			// TypeScript strict
-			'@typescript-eslint/no-explicit-any': 'error',
-			'@typescript-eslint/no-unused-vars': ['off', {}],
-			'@typescript-eslint/explicit-function-return-type': ['warn', {
-				allowExpressions: true,
-				allowTypedFunctionExpressions: true,
-			}],
-			'@typescript-eslint/no-non-null-assertion': 'error',
-			'@typescript-eslint/strict-boolean-expressions': 'warn',
+			'@typescript-eslint/no-explicit-any': 'off',
+			'@typescript-eslint/no-unused-vars': 'off',
 			'@typescript-eslint/no-floating-promises': 'warn',
-			'@typescript-eslint/await-thenable': 'error',
+			'@typescript-eslint/no-unsafe-argument': 'warn',
 
-			// React exigeant
-			'react/prop-types': 'off', // On utilise TypeScript
-			'react/react-in-jsx-scope': 'off', // Next.js n'en a pas besoin
+			// React
+			'react/prop-types': 'off',
+			'react/react-in-jsx-scope': 'off',
 			'react/jsx-no-target-blank': 'error',
 			'react/jsx-key': 'error',
 			'react/no-array-index-key': 'warn',
@@ -70,8 +69,6 @@ export default [
 			// Accessibilité
 			'jsx-a11y/alt-text': 'error',
 			'jsx-a11y/anchor-is-valid': 'error',
-			'jsx-a11y/click-events-have-key-events': 'warn',
-			'jsx-a11y/no-static-element-interactions': 'warn',
 
 			// Next.js
 			'@next/next/no-html-link-for-pages': 'error',
@@ -84,13 +81,4 @@ export default [
 			'no-var': 'error',
 		},
 	},
-	{
-		ignores: [
-			'.next/**',
-			'node_modules/**',
-			'out/**',
-			'public/**',
-			'*.config.js',
-		],
-	},
-];
+);

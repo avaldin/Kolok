@@ -1,77 +1,87 @@
-'use client'
+'use client';
 
-import React, { useEffect, useState } from 'react'
-import { storage } from '../lib/storage'
-import SetupName from './setup/SetupName'
-import SetupKolokName from './setup/SetupKolokName'
-import MainApp from './main/MainApp'
-import { getRoom } from '../lib/api'
-import { useToast } from './ui/Toast'
+import React, { useEffect, useState } from 'react';
+import { storage } from '../lib/storage';
+import SetupName from './setup/SetupName';
+import SetupKolokName from './setup/SetupKolokName';
+import MainApp from './main/MainApp';
+import { getRoom } from '../lib/api';
+import { useToast } from './ui/Toast';
+import Authentication from './auth/Authentication';
 
 export default function AppRouter() {
-	const [userName, setUserName] = useState<string | null>()
-	const [kolokName, setKolokName] = useState<string | null>()
-	const [isInitialized, setIsInitialized] = useState<boolean>(false)
-	const {showToast} = useToast()
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>();
+  const [kolokName, setKolokName] = useState<string | null>();
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const { showToast } = useToast();
 
-	useEffect(() => {
-		const userName = storage.getUserName()
-		const kolok = storage.getKolokName()
+  useEffect(() => {
+    const id = storage.getUserId();
+    const userName = storage.getUserName();
+    const kolok = storage.getKolokName();
 
-		setUserName(userName)
+    setUserId(id);
 
-		const setKolokNameIfExists = async () => {
-			if (kolok) {
-				await getRoom(kolok)
-				setKolokName(kolok)
-				}
-			else {
-				setKolokName('')
-				storage.setKolokName('')
-			}
-			setIsInitialized(true)
-		}
+    setUserName(userName);
 
-		try { setKolokNameIfExists() }
-		catch (e) {
-			if (e instanceof Error)
-				showToast(e.message, 'error')
-		}
-	}, [])
+    const setKolokNameIfExists = async () => {
+      if (kolok) {
+        await getRoom(kolok);
+        setKolokName(kolok);
+      } else {
+        setKolokName('');
+        storage.setKolokName('');
+      }
+      setIsInitialized(true);
+    };
 
-	if (!isInitialized) {
-		return (
-			<main className="flex min-h-screen items-center justify-center">
-				<p>Initialisation...</p>
-			</main>
-		)
-	}
+    try {
+      setKolokNameIfExists();
+    } catch (e) {
+      if (e instanceof Error) showToast(e.message, 'error');
+    }
+  }, []);
 
-	if (!userName) {
-		return <SetupName
-			onNameSet={(name: string) => {
-				storage.setUserName(name)
-				setUserName(name)
-			}}
-		/>
-	}
+  if (!isInitialized) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <p>Initialisation...</p>
+      </main>
+    );
+  }
 
+  if (!userId) return <Authentication onAuthSuccess={() => {}} />;
+  if (!userName) {
+    return (
+      <SetupName
+        onNameSet={(name: string) => {
+          storage.setUserName(name);
+          setUserName(name);
+        }}
+      />
+    );
+  }
 
-	if (!kolokName) {
-		return <SetupKolokName
-			onKolokNameSet={(name: string) => {
-				storage.setKolokName(name)
-				setKolokName(name)
-			}}
-		/>
-	}
+  if (!kolokName) {
+    return (
+      <SetupKolokName
+        onKolokNameSet={(name: string) => {
+          storage.setKolokName(name);
+          setKolokName(name);
+        }}
+      />
+    );
+  }
 
-	return <MainApp
-		userName={userName}
-		kolokName={kolokName}
-		clearKolokNameAction={() => {
-			storage.setKolokName('')
-			setKolokName('')
-		}}
-	/>
+  return (
+    <MainApp
+      userName={userName}
+      kolokName={kolokName}
+      clearKolokNameAction={() => {
+        storage.setKolokName('');
+        setKolokName('');
+      }}
+    />
+  );
 }
