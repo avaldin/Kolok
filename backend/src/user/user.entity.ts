@@ -22,8 +22,8 @@ export class User {
   verificationCodeExpires: Date | null;
 
   @ManyToOne(() => Room, (room) => room.users, { nullable: true })
-  room: Room;
+  room: Room | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, insert: false, update: false })
   roomName: string | null;
 }

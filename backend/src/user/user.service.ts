@@ -10,6 +10,7 @@ import { MailService } from '../mail/mail.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { LoginUserDto } from './dto/login.dto';
+import { Room } from '../room/room.entity';
 
 @Injectable()
 export class UserService {
@@ -123,7 +124,10 @@ export class UserService {
   // }
 
   async findOneById(id: string) {
-    const user = await this.userRepository.findOne({ where: { id: id } });
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      relations: ['room'],
+    });
     if (!user) {
       throw new BadRequestException('Utilisateur non trouvé');
     }
@@ -146,11 +150,11 @@ export class UserService {
     return user.roomName;
   }
 
-  async joinRoom(roomName: string, userId: string) {
+  async joinRoom(room: Room, userId: string) {
     const user = await this.findOneById(userId);
     if (user.roomName != null)
       throw new ConflictException(`vous etes deja dans une room`);
-    user.roomName = roomName;
+    user.room = room;
     await this.userRepository.save(user);
   }
 
@@ -158,7 +162,7 @@ export class UserService {
     const user = await this.findOneById(userId);
     if (user.roomName === null)
       throw new ConflictException(`vous n'etes pas dans une room`);
-    user.roomName = null;
+    user.room = null;
     await this.userRepository.save(user);
   }
 }

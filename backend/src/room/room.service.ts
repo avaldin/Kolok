@@ -25,7 +25,7 @@ export class RoomService {
     return this.roomRepository.save(room);
   }
 
-  async findByName(name: string): Promise<RoomDto> {
+  async getRoomDto(name: string): Promise<RoomDto> {
     const roomByName = await this.roomRepository.findOne({
       where: { name },
       relations: ['users'],
@@ -33,6 +33,15 @@ export class RoomService {
     if (!roomByName)
       throw new NotFoundException(`la room ${name} n'existe pas`);
     return roomByName.roomInformation();
+  }
+
+  async findByName(name: string): Promise<Room> {
+    const roomByName = await this.roomRepository.findOne({
+      where: { name },
+    });
+    if (!roomByName)
+      throw new NotFoundException(`la room ${name} n'existe pas`);
+    return roomByName;
   }
 
   async findRoomByUserId(userId: string): Promise<RoomDto> {
@@ -72,5 +81,14 @@ export class RoomService {
       );
     room.tools.push(toolsName);
     return this.roomRepository.save(room);
+  }
+
+  async joinRoom(roomName: string, userId: string) {
+    const room = await this.findByName(roomName);
+    await this.userService.joinRoom(room, userId);
+  }
+
+  async quitRoom(userId: string) {
+    await this.userService.leaveRoom(userId);
   }
 }

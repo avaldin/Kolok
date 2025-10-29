@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
@@ -28,15 +28,5 @@ export class UserController {
   resendCode(@Body('email') email: string) {
     console.log(email);
     return this.userService.resendVerificationCode(email);
-  }
-
-  @Post('join-room')
-  async joinRoom(@Body('id') id: string, @Body('roomName') roomName: string) {
-    await this.userService.joinRoom(roomName, id);
-  }
-
-  @Delete('leave-room')
-  async leaveRoom(@Body('id') id: string) {
-    await this.userService.leaveRoom(id);
   }
 }
