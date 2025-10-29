@@ -46,7 +46,6 @@ export class ShoppingListService {
   }
 
   async addItem(userId: string, item: string) {
-    console.log(userId, item);
     const room = await this.roomService.findRoomByUserId(userId);
     const shoppingList = await this.getShoppingList(room.name);
 

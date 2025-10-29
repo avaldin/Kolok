@@ -17,22 +17,18 @@ interface Room {
 export default function AppRouter() {
   const [userId, setUserId] = useState<string | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { showToast } = useToast();
 
-  // Premier useEffect: initialiser userId depuis storage
   useEffect(() => {
     const storedUserId = storage.getUserId();
     if (storedUserId) {
       setUserId(storedUserId);
     }
-    setIsLoading(false);
   }, []);
 
-  // Deuxième useEffect: charger la room quand userId change
   useEffect(() => {
     if (!userId) return;
-
     const loadRoom = async () => {
       try {
         const userRoom = await getRoomByUserId(userId);
@@ -48,26 +44,23 @@ export default function AppRouter() {
       }
     };
 
-    loadRoom();
+    setIsLoading(true);
+    loadRoom().then(() => setIsLoading(false));
   }, [userId]);
 
-  // Callback après authentification réussie
   const handleAuthSuccess = (id: string) => {
     storage.setUserId(id);
     setUserId(id);
   };
 
-  // Callback après assignation d'une room
   const handleRoomSet = (roomData: Room) => {
     setRoom(roomData);
   };
 
-  // Callback pour quitter la room (future feature)
   const handleLeaveRoom = () => {
     setRoom(null);
   };
 
-  // États de rendu
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-peach-yellow">

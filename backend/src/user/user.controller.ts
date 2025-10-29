@@ -26,7 +26,6 @@ export class UserController {
 
   @Post('resend-code')
   resendCode(@Body('email') email: string) {
-    console.log(email);
     return this.userService.resendVerificationCode(email);
   }
 }
