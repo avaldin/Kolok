@@ -1,5 +1,4 @@
-import { Body, Controller, Delete, Post } from '@nestjs/common';
-import { NameValidationPipe } from '../common/pipe/nameValidation.pipe';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { SubscriptionDto } from './dto/subscribtion';
 
@@ -7,16 +6,21 @@ import { SubscriptionDto } from './dto/subscribtion';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
+  @Get('vapid-key')
+  vapidKey() {
+    return this.notificationsService.vapidKey;
+  }
+
   @Post()
   async subscribe(
-    @Body('userId', NameValidationPipe) userId: string,
-    @Body() subscribtionDto: SubscriptionDto,
+    @Body('userId') userId: string,
+    @Body('subscriptionDto') subscriptionDto: SubscriptionDto,
   ) {
-    await this.notificationsService.subscribe(subscribtionDto, userId);
+    await this.notificationsService.subscribe(subscriptionDto, userId);
   }
 
   @Delete()
-  async unSubscribe(@Body('roomName', NameValidationPipe) roomName: string) {
-    await this.notificationsService.unSubscribe(roomName);
+  async unSubscribe(@Body('userId') userId: string) {
+    await this.notificationsService.unSubscribe(userId);
   }
 }

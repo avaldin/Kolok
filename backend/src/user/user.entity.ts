@@ -15,15 +15,15 @@ export class User {
   @Column({ type: 'boolean', default: false })
   isEmailVerified: boolean;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, default: null })
   verificationCode: string | null;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, default: null })
   verificationCodeExpires: Date | null;
 
   @ManyToOne(() => Room, (room) => room.users, { nullable: true })
   room: Room | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, default: null })
   roomName: string | null;
 }

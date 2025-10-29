@@ -1,7 +1,10 @@
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-class SubscriptionKeys {
+export class SubscriptionDto {
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+
   @IsString()
   @IsNotEmpty()
   p256dh: string;
@@ -9,14 +12,4 @@ class SubscriptionKeys {
   @IsString()
   @IsNotEmpty()
   auth: string;
-}
-
-export class SubscriptionDto {
-  @IsString()
-  @IsNotEmpty()
-  url: string;
-
-  @ValidateNested()
-  @Type(() => SubscriptionKeys)
-  keys: SubscriptionKeys;
 }

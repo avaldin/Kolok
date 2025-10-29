@@ -6,7 +6,7 @@ interface Room {
   tools: string[];
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 /**
  * Récupère la room associée à un utilisateur
@@ -164,9 +164,10 @@ export async function addTool(roomName: string, tool: string) {
 }
 
 export async function sendSubscriptionToBackend(
-  subscription: PushSubscription,
+  userId: string,
+  subscription: { url: string; p256dh: string; auth: string },
 ) {
-  console.log(subscription.options);
+  console.log(subscription);
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/notifications`,
     {
@@ -174,7 +175,7 @@ export async function sendSubscriptionToBackend(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ URL: subscription }),
+      body: JSON.stringify({ subscriptionDto: subscription, userId }),
     },
   );
   if (!response.ok) {
@@ -185,11 +186,7 @@ export async function sendSubscriptionToBackend(
   }
 }
 
-export async function sendUnsubscriptionToBackend(
-  subscription: PushSubscription,
-) {
-  console.log(subscription);
-
+export async function sendUnsubscriptionToBackend(userId: string) {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/notifications`,
     {
@@ -197,63 +194,12 @@ export async function sendUnsubscriptionToBackend(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ URL: subscription }),
+      body: JSON.stringify({ userId: userId }),
     },
   );
   if (!response.ok) {
     console.log(`error during subscription to backend`);
     const error = (await response.json()) as { message: string };
     throw new Error(error.message);
-  }
-}
-
-export async function registerUser(email: string, name: string): Promise<void> {
-  const response = await fetch(`${API_URL}/user/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, name }),
-  });
-  if (!response.ok) {
-    const errorData = (await response.json()) as { message: string };
-    throw new Error(
-      errorData.message || 'Erreur lors de la création du compte',
-    );
-  }
-}
-
-export async function loginUser(email: string): Promise<void> {
-  const response = await fetch(`${API_URL}/user/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
-  });
-  if (!response.ok) {
-    const errorData = (await response.json()) as { message: string };
-    throw new Error(errorData.message || 'Erreur lors de la connexion');
-  }
-}
-
-export async function verifyEmail(email: string, code: string) {
-  const response = await fetch(`${API_URL}/user/verify-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, code }),
-  });
-  if (!response.ok) {
-    const errorData = (await response.json()) as { message: string };
-    throw new Error(errorData.message || 'Code invalide');
-  }
-  const { userId } = (await response.json()) as { userId: string };
-}
-
-export async function resendVerificationCode(email: string): Promise<void> {
-  const response = await fetch(`${API_URL}/user/resend-code`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
-  });
-  if (!response.ok) {
-    const errorData = (await response.json()) as { message: string };
-    throw new Error(errorData.message || "Erreur lors de l'envoi du code");
   }
 }

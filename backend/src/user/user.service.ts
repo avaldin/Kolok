@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { LoginUserDto } from './dto/login.dto';
 import { Room } from '../room/room.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class UserService {
@@ -18,6 +19,7 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private mailService: MailService,
+    private notificationsService: NotificationsService,
   ) {}
 
   private generateVerificationCode(): string {
@@ -37,7 +39,7 @@ export class UserService {
     const verificationCodeExpires = new Date();
     verificationCodeExpires.setMinutes(
       verificationCodeExpires.getMinutes() + 15,
-    ); // attention si getMinute + 15 > 59
+    );
 
     const user = this.userRepository.create({
       email: createUserDto.email,
@@ -48,6 +50,7 @@ export class UserService {
     });
 
     await this.userRepository.save(user);
+    await this.notificationsService.create(user);
 
     await this.mailService.sendVerificationEmail(user.email, verificationCode);
 

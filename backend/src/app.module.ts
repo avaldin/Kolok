@@ -9,6 +9,7 @@ import { validateEnv } from './config/env.config';
 import { config } from 'dotenv';
 import { MailModule } from './mail/mail.module';
 import { UserModule } from './user/user.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 config();
 
@@ -31,6 +32,7 @@ const envConfig = validateEnv(process.env);
     ShoppingListModule,
     UserModule,
     MailModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

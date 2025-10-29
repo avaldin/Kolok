@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { sendUnsubscriptionToBackend } from './api';
+import {
+  API_URL,
+  sendSubscriptionToBackend,
+  sendUnsubscriptionToBackend,
+} from './api';
 import { urlBase64ToUint8Array } from './validation';
 
 export function useShoppingListSocket(
@@ -24,7 +28,7 @@ export function useShoppingListSocket(
   }, [userId, onUpdate]);
 }
 
-export function useServiceWorker() {
+export function useServiceWorker(userId: string) {
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
   const [isSupported, setIsSupported] = useState(false);
@@ -56,8 +60,8 @@ export function useServiceWorker() {
         `si vous voulez etre notifier dans l'avenir, activez les notifications dans les paramettres`,
       );
 
-    const vapidPublicKey = `BNTiOxNslsP1rKKRvRuz8tkTXkNNF1zelRkMyxeWCnv0_rfLMVsXlZWti6SPjLTbbGZvM6semMBkV_KOCx1kkQw`;
-
+    const response = await fetch(`${API_URL}/notifications/vapid-key`);
+    const vapidPublicKey = await response.text();
     try {
       const pushSubscription: PushSubscription =
         await registration.pushManager.subscribe({
@@ -65,8 +69,13 @@ export function useServiceWorker() {
           applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
         });
       setSubscription(pushSubscription);
-      // const subscriptionData = pushSubscription.toJSON();
-      // await sendSubscriptionToBackend(subscriptionData);
+      const subscriptionJSON = pushSubscription.toJSON();
+      const subscriptionDto = {
+        url: subscriptionJSON.endpoint as string,
+        p256dh: subscriptionJSON.keys?.p256dh as string,
+        auth: subscriptionJSON.keys?.auth as string,
+      }; //zod
+      await sendSubscriptionToBackend(userId, subscriptionDto);
     } catch (e) {
       console.error(e);
       throw new Error(`Erreur dans l'activation des notifications.`);
@@ -77,7 +86,7 @@ export function useServiceWorker() {
     if (!subscription || !registration)
       throw new Error('Service worker pas encore enregistre');
     try {
-      await sendUnsubscriptionToBackend(subscription);
+      await sendUnsubscriptionToBackend(userId);
       const success = await registration.unregister();
       if (success) {
         setSubscription(null);

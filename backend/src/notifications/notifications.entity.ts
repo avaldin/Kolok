@@ -1,14 +1,9 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { User } from '../user/user.entity';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Notifications {
   @PrimaryColumn()
   userId: string;
-
-  @OneToOne(() => User)
-  @JoinColumn()
-  user: User;
 
   @Column({ type: 'varchar', nullable: true })
   url: string | null;
