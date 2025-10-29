@@ -14,14 +14,14 @@ export function useShoppingListSocket(
 
     const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
-    socket.emit('joinShoppingList', roomName);
+    socket.emit('joinShoppingList', userId);
     socket.on('listUpdated', onUpdate);
 
     return (): void => {
       socket.off('listUpdated', onUpdate);
       socket.disconnect();
     };
-  }, [roomName, onUpdate]);
+  }, [userId, onUpdate]);
 }
 
 export function useServiceWorker() {

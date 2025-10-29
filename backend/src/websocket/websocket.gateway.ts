@@ -8,6 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { validateEnv } from '../config/env.config';
 import { config } from 'dotenv';
+import { RoomService } from '../room/room.service';
 
 config();
 
@@ -19,15 +20,15 @@ const env = validateEnv(process.env);
 export class EventsGateway {
   @WebSocketServer()
   server: Server;
-
-  constructor() {}
+  constructor(private roomService: RoomService) {}
 
   @SubscribeMessage('joinShoppingList')
   async handleJoin(
-    @MessageBody() roomName: string,
+    @MessageBody() userId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    await client.join(`shopping-list:${roomName}`);
+    const room = await this.roomService.findRoomByUserId(userId);
+    await client.join(`shopping-list:${room.name}`);
   }
 
   notifyShoppingListUpdate(roomName: string) {

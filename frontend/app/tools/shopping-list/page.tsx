@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { deleteItem, getItems, postItem } from '../../lib/api';
 import { useToast } from '../../lib/toast';
 import { useShoppingListSocket } from '../../lib/hooks';
-import { storage } from '../../lib/storage';
 import { useRouter } from 'next/navigation';
 
 export default function ToolPage() {
@@ -13,8 +12,15 @@ export default function ToolPage() {
   const [items, setItems] = useState<string[]>([]);
   const [inputItem, setInputItem] = useState('');
   const [, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const userId = storage.getUserId();
+  useEffect(() => {
+    const id = localStorage.getItem('userId');
+    setUserId(id);
+    if (!id) {
+      router.push('/');
+    }
+  }, []);
 
   const loadItems = useCallback(async () => {
     if (!userId) return;
@@ -23,24 +29,22 @@ export default function ToolPage() {
       setItems(items);
     } catch (e) {
       if (e instanceof Error) showToast(e.message, 'error');
+      router.push('/');
     } finally {
       setLoading(false);
     }
   }, [userId]);
 
   useEffect(() => {
+    if (!userId) return;
     loadItems();
-  }, [loadItems]);
+  }, [loadItems, userId]);
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   useShoppingListSocket(userId, loadItems);
 
-  if (!userId) {
-    router.push('/');
-    return null;
-  }
-
   const addItem = async () => {
+    if (!userId) return;
     try {
       await postItem(userId, inputItem.trim());
       setItems((prevArray) => [...prevArray, inputItem.trim()]);
@@ -52,6 +56,7 @@ export default function ToolPage() {
   };
 
   const removeItem = async (itemName: string) => {
+    if (!userId) return;
     try {
       await deleteItem(userId, itemName);
       setItems((prevArray) => [
@@ -91,7 +96,9 @@ export default function ToolPage() {
           />
 
           <button
-            onClick={void addItem}
+            onClick={() => {
+              addItem();
+            }}
             className="px-4 py-2 rounded-md border border-bistre bg-atomic-tangerine
 						text-bistre font-semibold hover:bg-atomic-tangerine/90 transition"
           >
@@ -116,7 +123,9 @@ export default function ToolPage() {
                 <input
                   type="checkbox"
                   checked={false}
-                  onChange={() => void removeItem(item)}
+                  onChange={() => {
+                    removeItem(item);
+                  }}
                   className="w-5 h-5 cursor-pointer bg-cadet-gray appearance-none rounded border border-bistre checked:bg-bistre"
                 />
               </div>

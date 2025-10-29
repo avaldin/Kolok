@@ -10,20 +10,18 @@ import {
 import { NameValidationPipe } from '../common/pipe/nameValidation.pipe';
 import { ShoppingListService } from './shopping-list.service';
 import { ShoppingList } from './shoppintg-list.entity';
-import { EventsGateway } from '../websocket/websocket.gateway';
 
 @Controller('shopping-list')
 export class ShoppingListController {
-  constructor(
-    private readonly shoppingListService: ShoppingListService,
-    private eventsGateway: EventsGateway,
-  ) {}
+  constructor(private readonly shoppingListService: ShoppingListService) {}
 
-  @Post(':roomName')
-  async create(
-    @Param('roomName', NameValidationPipe) roomName: string,
-  ): Promise<ShoppingList> {
-    return this.shoppingListService.create(roomName);
+  @Post('/item')
+  @HttpCode(201)
+  async addItem(
+    @Body('userId') userId: string,
+    @Body('item', NameValidationPipe) item: string,
+  ) {
+    await this.shoppingListService.addItem(userId, item);
   }
 
   @Delete(':roomName')
@@ -32,27 +30,23 @@ export class ShoppingListController {
     return this.shoppingListService.delete(roomName);
   }
 
-  @Post(':roomName/item')
-  @HttpCode(201)
-  async addItem(
-    @Param('roomName', NameValidationPipe) roomName: string,
-    @Body('item', NameValidationPipe) item: string,
-  ) {
-    await this.shoppingListService.addItem(roomName, item);
-    this.eventsGateway.notifyShoppingListUpdate(roomName);
-  }
-
-  @Delete(':roomName/item/:itemName')
+  @Delete(':userId/item/:itemName')
   async deleteItem(
-    @Param('roomName', NameValidationPipe) roomName: string,
+    @Param('userId') userId: string,
     @Param('itemName', NameValidationPipe) itemName: string,
   ) {
-    await this.shoppingListService.deleteItem(roomName, itemName);
-    this.eventsGateway.notifyShoppingListUpdate(roomName);
+    await this.shoppingListService.deleteItem(userId, itemName);
   }
 
-  @Get(':roomName/items')
-  async getItems(@Param('roomName', NameValidationPipe) roomName: string) {
-    return this.shoppingListService.getItems(roomName);
+  @Get(':userId/items')
+  async getItems(@Param('userId') userId: string) {
+    return this.shoppingListService.getItems(userId);
+  }
+
+  @Post(':roomName')
+  async create(
+    @Param('roomName', NameValidationPipe) roomName: string,
+  ): Promise<ShoppingList> {
+    return this.shoppingListService.create(roomName);
   }
 }

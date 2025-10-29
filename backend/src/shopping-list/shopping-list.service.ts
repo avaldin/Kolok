@@ -7,6 +7,7 @@ import { ShoppingList } from './shoppintg-list.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoomService } from '../room/room.service';
+import { EventsGateway } from '../websocket/websocket.gateway';
 
 @Injectable()
 export class ShoppingListService {
@@ -14,6 +15,7 @@ export class ShoppingListService {
     @InjectRepository(ShoppingList)
     private shoppingListRepository: Repository<ShoppingList>,
     private roomService: RoomService,
+    private eventsGateway: EventsGateway,
   ) {}
 
   async create(roomName: string): Promise<ShoppingList> {
@@ -43,27 +45,33 @@ export class ShoppingListService {
     return shoppingList;
   }
 
-  async addItem(roomName: string, item: string) {
-    const shoppingList = await this.getShoppingList(roomName);
+  async addItem(userId: string, item: string) {
+    console.log(userId, item);
+    const room = await this.roomService.findRoomByUserId(userId);
+    const shoppingList = await this.getShoppingList(room.name);
 
     if (shoppingList.items.includes(item)) {
       throw new ConflictException(`cette article est deja dans la liste`);
     }
     shoppingList.items.push(item);
-    return this.shoppingListRepository.save(shoppingList);
+    await this.shoppingListRepository.save(shoppingList);
+    this.eventsGateway.notifyShoppingListUpdate(room.name);
   }
 
-  async deleteItem(roomName: string, item: string) {
-    const shoppingList = await this.getShoppingList(roomName);
+  async deleteItem(userId: string, item: string) {
+    const room = await this.roomService.findRoomByUserId(userId);
+    const shoppingList = await this.getShoppingList(room.name);
     if (!shoppingList.items.includes(item)) {
       throw new NotFoundException(`cette article n'est pas dans la liste`);
     }
     shoppingList.items = shoppingList.items.filter((i) => i !== item);
-    return this.shoppingListRepository.save(shoppingList);
+    await this.shoppingListRepository.save(shoppingList);
+    this.eventsGateway.notifyShoppingListUpdate(room.name);
   }
 
-  async getItems(roomName: string) {
-    const shoppingList = await this.getShoppingList(roomName);
+  async getItems(userId: string) {
+    const room = await this.roomService.findRoomByUserId(userId);
+    const shoppingList = await this.getShoppingList(room.name);
     return shoppingList.items;
   }
 }

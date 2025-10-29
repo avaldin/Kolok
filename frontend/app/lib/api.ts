@@ -103,9 +103,7 @@ export async function joinRoom(
 }
 
 export async function getItems(userId: string) {
-  const response = await fetch(
-    `${API_URL}/shopping-list/${encodeURIComponent(roomName)}/items`,
-  );
+  const response = await fetch(`${API_URL}/shopping-list/${userId}/items`);
   if (!response.ok) {
     if (response.status === 404) {
       const errorData = (await response.json()) as { message: string };
@@ -118,12 +116,8 @@ export async function getItems(userId: string) {
 }
 
 export async function deleteItem(userId: string, item: string) {
-  if (!kolokNameValidator(roomName))
-    throw new Error(
-      `le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`,
-    );
   const response = await fetch(
-    `${API_URL}/shopping-list/${encodeURIComponent(roomName)}/item/${encodeURIComponent(item)}`,
+    `${API_URL}/shopping-list/${userId}/item/${encodeURIComponent(item)}`,
     {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
