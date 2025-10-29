@@ -21,7 +21,6 @@ function OptionButton({ userId }: OptionButtonProps) {
     showToast('Fonctionnalité à implémenter: changer de nom', 'info');
   };
 
-  // TODO: Implémenter le changement de kolok (quitter la room actuelle)
   const handleChangeKolok = async () => {
     try {
       await quitRoom(userId);

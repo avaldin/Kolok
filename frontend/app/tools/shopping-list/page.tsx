@@ -4,42 +4,45 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { deleteItem, getItems, postItem } from '../../lib/api';
 import { useToast } from '../../lib/toast';
 import { useShoppingListSocket } from '../../lib/hooks';
+import { storage } from '../../lib/storage';
+import { useRouter } from 'next/navigation';
 
-// TODO: Cette page nécessite une refonte complète pour fonctionner avec le nouveau système.
-// Options possibles:
-// 1. Créer un Context React qui fournit room/userId à toutes les pages
-// 2. Refactoriser en route dynamique: app/[roomName]/tools/shopping-list/page.tsx
-// 3. Passer roomName via les props depuis MainApp (nécessite restructuration)
 export default function ToolPage() {
   const { showToast } = useToast();
+  const router = useRouter();
   const [items, setItems] = useState<string[]>([]);
   const [inputItem, setInputItem] = useState('');
   const [, setLoading] = useState(true);
 
-  // FIXME: storage.getKolokName() n'existe plus - nécessite refonte
-  const roomName: string = ''; // storage.getKolokName() ?? ''
+  const userId = storage.getUserId();
 
   const loadItems = useCallback(async () => {
+    if (!userId) return;
     try {
-      const items = await getItems(roomName);
+      const items = await getItems(userId);
       setItems(items);
     } catch (e) {
       if (e instanceof Error) showToast(e.message, 'error');
     } finally {
       setLoading(false);
     }
-  }, [roomName]);
+  }, [userId]);
 
   useEffect(() => {
     loadItems();
   }, [loadItems]);
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  useShoppingListSocket(roomName, loadItems);
+  useShoppingListSocket(userId, loadItems);
+
+  if (!userId) {
+    router.push('/');
+    return null;
+  }
 
   const addItem = async () => {
     try {
-      await postItem(roomName, inputItem.trim());
+      await postItem(userId, inputItem.trim());
       setItems((prevArray) => [...prevArray, inputItem.trim()]);
       setInputItem('');
     } catch (e) {
@@ -50,7 +53,7 @@ export default function ToolPage() {
 
   const removeItem = async (itemName: string) => {
     try {
-      await deleteItem(roomName, itemName);
+      await deleteItem(userId, itemName);
       setItems((prevArray) => [
         ...prevArray.filter((item) => item !== itemName),
       ]);

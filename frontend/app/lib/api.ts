@@ -1,4 +1,4 @@
-import { kolokNameValidator, nameValidator } from './validation';
+import { kolokNameValidator } from './validation';
 
 interface Room {
   name: string;
@@ -69,19 +69,12 @@ export async function createRoom(roomName: string) {
   }
 }
 
-export async function postItem(roomName: string, item: string) {
-  if (!nameValidator(roomName))
-    throw new Error(
-      `le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`,
-    );
-  const response = await fetch(
-    `${API_URL}/shopping-list/${encodeURIComponent(roomName)}/item`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ item: item }),
-    },
-  );
+export async function postItem(userId: string, item: string) {
+  const response = await fetch(`${API_URL}/shopping-list/item`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ item: item, userId: userId }),
+  });
   if (!response.ok) {
     const errorData = (await response.json()) as { message: string };
     throw new Error(errorData.message);
@@ -97,7 +90,7 @@ export async function joinRoom(
       `le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`,
     );
 
-  const response = await fetch(`${API_URL}/user/join-room`, {
+  const response = await fetch(`${API_URL}/room/join-room`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id: userId, roomName: roomName }),
@@ -109,11 +102,7 @@ export async function joinRoom(
   }
 }
 
-export async function getItems(roomName: string) {
-  if (!kolokNameValidator(roomName))
-    throw new Error(
-      `le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`,
-    );
+export async function getItems(userId: string) {
   const response = await fetch(
     `${API_URL}/shopping-list/${encodeURIComponent(roomName)}/items`,
   );
@@ -128,7 +117,7 @@ export async function getItems(roomName: string) {
   return items;
 }
 
-export async function deleteItem(roomName: string, item: string) {
+export async function deleteItem(userId: string, item: string) {
   if (!kolokNameValidator(roomName))
     throw new Error(
       `le nom doit contenir seulemet des lettres, des espaces, les caracteres suivants [' - _], et doit contenir entre 5 et 25 caracteres`,
@@ -149,12 +138,8 @@ export async function deleteItem(roomName: string, item: string) {
   }
 }
 
-// TODO: Cette fonction nécessite une refonte pour utiliser userId au lieu de userName
-// depuis le localStorage. L'endpoint backend attend le participantName mais on n'a plus
-// accès au userName côté frontend. Solution possible: utiliser DELETE /user/leave-room
-// avec userId uniquement
 export async function quitRoom(userId: string): Promise<void> {
-  const response = await fetch(`${API_URL}/user/leave-room`, {
+  const response = await fetch(`${API_URL}/room/leave-room`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id: userId }),

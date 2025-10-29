@@ -35,13 +35,13 @@ export default function AppRouter() {
 
     const loadRoom = async () => {
       try {
-        console.log(userId);
         const userRoom = await getRoomByUserId(userId);
         if (userRoom) {
           setRoom(userRoom);
         }
       } catch (error) {
         console.error('Erreur chargement room:', error);
+        setUserId(null);
         if (error instanceof Error) {
           showToast(error.message, 'error');
         }

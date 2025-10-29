@@ -6,10 +6,12 @@ import { sendUnsubscriptionToBackend } from './api';
 import { urlBase64ToUint8Array } from './validation';
 
 export function useShoppingListSocket(
-  roomName: string,
+  userId: string | null,
   onUpdate: () => void,
 ): void {
   useEffect((): (() => void) => {
+    if (!userId) return () => {};
+
     const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
     socket.emit('joinShoppingList', roomName);

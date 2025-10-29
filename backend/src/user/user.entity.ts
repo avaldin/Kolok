@@ -24,6 +24,6 @@ export class User {
   @ManyToOne(() => Room, (room) => room.users, { nullable: true })
   room: Room | null;
 
-  @Column({ type: 'varchar', nullable: true, insert: false, update: false })
+  @Column({ type: 'varchar', nullable: true })
   roomName: string | null;
 }
