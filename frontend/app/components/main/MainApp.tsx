@@ -1,6 +1,5 @@
 'use client';
 
-import { Header } from '../layout/header';
 import ResumeCard from '../layout/resumeCard';
 
 interface Room {
@@ -17,17 +16,14 @@ interface MainAppProps {
 
 export default function MainApp({ room, userId, onLeaveRoom }: MainAppProps) {
   return (
-    <>
-      <main className="flex flex-col min-h-screen justify-center">
-        <Header userId={userId} />
-        <div className="flex-1 flex items-center">
-          <ResumeCard
-            name={room.name}
-            participants={room.participants}
-            tools={room.tools}
-          />
-        </div>
-      </main>
-    </>
+    <main className="flex flex-col min-h-screen justify-center">
+      <div className="flex-1 flex items-center">
+        <ResumeCard
+          name={room.name}
+          participants={room.participants}
+          tools={room.tools}
+        />
+      </div>
+    </main>
   );
 }
