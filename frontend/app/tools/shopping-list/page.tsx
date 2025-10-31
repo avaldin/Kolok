@@ -47,7 +47,6 @@ export default function ToolPage() {
     if (!userId) return;
     try {
       await postItem(userId, inputItem.trim());
-      setItems((prevArray) => [...prevArray, inputItem.trim()]);
       setInputItem('');
     } catch (e) {
       if (e instanceof Error) showToast(e.message, 'error');
@@ -59,12 +58,8 @@ export default function ToolPage() {
     if (!userId) return;
     try {
       await deleteItem(userId, itemName);
-      setItems((prevArray) => [
-        ...prevArray.filter((item) => item !== itemName),
-      ]);
     } catch (e) {
       if (e instanceof Error) showToast(e.message, 'error');
-      setInputItem('');
     }
   };
 

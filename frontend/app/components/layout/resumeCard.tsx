@@ -109,7 +109,9 @@ const ResumeCard = ({ name, participants, tools }: Room) => {
                       {availableTools.map((tool, index) => (
                         <li key={index}>
                           <button
-                            onClick={() => void handleAddTool(tool)}
+                            onClick={() => {
+                              handleAddTool(tool);
+                            }}
                             className="w-full text-left px-3 py-2 bg-peach-yellow hover:bg-cadet-gray transition rounded-md border border-bistre text-bistre font-medium"
                           >
                             {tool}

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { SubscriptionDto } from './dto/subscribtion';
 
@@ -9,6 +9,11 @@ export class NotificationsController {
   @Get('vapid-key')
   vapidKey() {
     return this.notificationsService.vapidKey;
+  }
+
+  @Get(':userId/status')
+  async getStatus(@Param('userId') userId: string) {
+    return this.notificationsService.getUserStatus(userId);
   }
 
   @Post()

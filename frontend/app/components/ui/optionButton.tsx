@@ -1,9 +1,9 @@
 'use client';
 
 import { Bell, LogOut, Settings, User } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { storage } from '../../lib/storage';
-import { quitRoom } from '../../lib/api';
+import { getNotificationStatus, quitRoom } from '../../lib/api';
 import { useToast } from './Toast';
 import { useServiceWorker } from '../../lib/hooks';
 
@@ -15,6 +15,26 @@ function OptionButton({ userId }: OptionButtonProps) {
   const { showToast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   // TODO: Implémenter le changement de nom (modifier User.name côté backend)
   const handleChangeName = () => {
@@ -59,14 +79,22 @@ function OptionButton({ userId }: OptionButtonProps) {
 
   const handleToggleNotifications = () => {
     const newState = !notificationsEnabled;
+    setIsOpen(false);
     setNotificationsEnabled(newState);
     void switchNotification(newState);
   };
 
+  const handleToggleSettings = async () => {
+    setNotificationsEnabled(await getNotificationStatus(userId));
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <div className="relative flex items-center">
+    <div className="relative flex items-center" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          handleToggleSettings();
+        }}
         className="flex items-center justify-center m-1 p-1 bg-brown-sugar rounded-md shadow-amber-200 hover:bg-atomic-tangerine transition-colors"
         aria-label="Options"
       >
@@ -112,7 +140,9 @@ function OptionButton({ userId }: OptionButtonProps) {
             Changer de nom
           </button>
           <button
-            onClick={() => void handleChangeKolok()}
+            onClick={() => {
+              handleChangeKolok();
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-atomic-tangerine rounded-md hover:bg-peach-yellow transition-colors text-bistre font-medium"
           >
             <LogOut size={18} />

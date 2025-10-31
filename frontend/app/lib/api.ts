@@ -199,3 +199,8 @@ export async function sendUnsubscriptionToBackend(userId: string) {
     throw new Error(error.message);
   }
 }
+
+export async function getNotificationStatus(userId: string) {
+  const response = await fetch(`${API_URL}/notifications/${userId}/status`);
+  return response.json() as Promise<boolean>;
+}

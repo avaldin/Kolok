@@ -34,6 +34,14 @@ export class NotificationsService implements OnModuleInit {
     webPush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
   }
 
+  async getUserStatus(userId: string) {
+    const userNotification = await this.notificationsRepository.findOne({
+      where: { userId },
+    });
+    console.log(userNotification, !!userNotification && !!userNotification.url);
+    return !!userNotification && !!userNotification.url;
+  }
+
   async subscribe(subscriptionDto: SubscriptionDto, userId: string) {
     let userNotification = await this.notificationsRepository.findOne({
       where: { userId },
@@ -59,6 +67,7 @@ export class NotificationsService implements OnModuleInit {
     userNotification.url = null;
     userNotification.authKey = null;
     userNotification.encryptionKey = null;
+    await this.notificationsRepository.save(userNotification);
   }
 
   async getRoomSubscriptions(roomName: string, exeptedId: string[]) {
