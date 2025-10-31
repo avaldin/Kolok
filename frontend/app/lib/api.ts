@@ -155,6 +155,8 @@ export async function addTool(roomName: string, tool: string) {
     },
   );
   if (!response.ok) {
+    if (response.status === 404)
+      throw new Error(`cette fonctionnalité n'est toujours pas implémentée`);
     const errorData = (await response.json()) as { message: string };
     throw new Error(errorData.message);
   }
