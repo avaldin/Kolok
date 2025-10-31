@@ -28,7 +28,7 @@ export function useShoppingListSocket(
   }, [userId, onUpdate]);
 }
 
-export function useServiceWorker(userId: string) {
+export function useServiceWorker() {
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
   const [isSupported, setIsSupported] = useState(false);
@@ -50,7 +50,7 @@ export function useServiceWorker(userId: string) {
       });
   }, []);
 
-  const subscribeToNotifications = async () => {
+  const subscribeToNotifications = async (userId: string) => {
     if (!registration) {
       throw new Error('Service worker pas encore enregistre');
     }
@@ -84,7 +84,7 @@ export function useServiceWorker(userId: string) {
     }
   };
 
-  const unSubscribeToNotifications = async () => {
+  const unSubscribeToNotifications = async (userId: string) => {
     if (!subscription || !registration) {
       await sendUnsubscriptionToBackend(userId);
 

@@ -56,7 +56,7 @@ function OptionButton({ userId }: OptionButtonProps) {
   };
 
   const { isSupported, subscribeToNotifications, unSubscribeToNotifications } =
-    useServiceWorker(userId);
+    useServiceWorker();
 
   const switchNotification = async (enabled: boolean) => {
     if (enabled === true) {
@@ -64,13 +64,13 @@ function OptionButton({ userId }: OptionButtonProps) {
         showToast(`Votre support ne gere pas les notifictions.`, `error`);
       }
       try {
-        await subscribeToNotifications();
+        await subscribeToNotifications(userId);
       } catch (e) {
         if (e instanceof Error) showToast(e.message, 'error');
       }
     } else {
       try {
-        await unSubscribeToNotifications();
+        await unSubscribeToNotifications(userId);
       } catch (e) {
         if (e instanceof Error) showToast(e.message, 'error');
       }
