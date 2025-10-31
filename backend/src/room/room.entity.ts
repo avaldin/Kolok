@@ -14,18 +14,20 @@ export class Room {
   tools: string[];
 
   idArrayToNameArray(): string[] {
-    const nameArray: string[] = this.users.map((user) => user.name);
-    return nameArray;
+    return this.users.map((user) => user.name);
+  }
+
+  userIds(): string[] {
+    return this.users.map((user) => user.id);
   }
 
   roomInformation(): RoomDto {
     const participants: string[] = this.idArrayToNameArray();
 
-    const roomDto: RoomDto = {
+    return {
       name: this.name,
       participants: participants,
       tools: this.tools,
     };
-    return roomDto;
   }
 }

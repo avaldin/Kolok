@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoomService } from '../room/room.service';
 import { EventsGateway } from '../websocket/websocket.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ShoppingListService {
@@ -16,6 +17,7 @@ export class ShoppingListService {
     private shoppingListRepository: Repository<ShoppingList>,
     private roomService: RoomService,
     private eventsGateway: EventsGateway,
+    private notificationService: NotificationsService,
   ) {}
 
   async create(roomName: string): Promise<ShoppingList> {
@@ -55,6 +57,15 @@ export class ShoppingListService {
     shoppingList.items.push(item);
     await this.shoppingListRepository.save(shoppingList);
     this.eventsGateway.notifyShoppingListUpdate(room.name);
+    await this.notificationService.sendRoomNotification({
+      roomName: room.name,
+      senderId: userId,
+      payload: {
+        title: `Liste de Course`,
+        body: `${item} a ete ajoute a la liste`,
+        url: `/tools/shopping-list/`,
+      },
+    });
   }
 
   async deleteItem(userId: string, item: string) {

@@ -29,6 +29,9 @@ export class EnvConfig {
   @IsString()
   VAPID_KEY_PRIVATE: string;
 
+  @IsString()
+  VAPID_SUBJECT: string;
+
   @IsEmail()
   EMAIL_USER: string;
 
