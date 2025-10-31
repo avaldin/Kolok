@@ -36,7 +36,7 @@ function OptionButton({ userId }: OptionButtonProps) {
   };
 
   const { isSupported, subscribeToNotifications, unSubscribeToNotifications } =
-    useServiceWorker();
+    useServiceWorker(userId);
 
   const switchNotification = async (enabled: boolean) => {
     if (enabled === true) {

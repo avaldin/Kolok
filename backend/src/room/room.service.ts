@@ -38,6 +38,7 @@ export class RoomService {
   async findByName(name: string): Promise<Room> {
     const roomByName = await this.roomRepository.findOne({
       where: { name },
+      relations: ['users'],
     });
     if (!roomByName)
       throw new NotFoundException(`la room ${name} n'existe pas`);

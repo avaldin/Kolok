@@ -27,8 +27,7 @@ export async function getRoomByUserId(userId: string): Promise<Room | null> {
       errorData.message || 'Erreur lors de la récupération de la room',
     );
   }
-  const room = (await response.json()) as Room;
-  return room;
+  return (await response.json()) as Room;
 }
 
 export async function getRoom(roomName: string): Promise<Room> {
@@ -46,8 +45,7 @@ export async function getRoom(roomName: string): Promise<Room> {
     }
     throw new Error(`Erreur ${response.status}`);
   }
-  const room = (await response.json()) as Room;
-  return room;
+  return (await response.json()) as Room;
 }
 
 export async function createRoom(roomName: string) {
@@ -111,8 +109,7 @@ export async function getItems(userId: string) {
     }
     throw new Error(`Erreur ${response.status}`);
   }
-  const items = (await response.json()) as string[];
-  return items;
+  return (await response.json()) as string[];
 }
 
 export async function deleteItem(userId: string, item: string) {
@@ -167,7 +164,6 @@ export async function sendSubscriptionToBackend(
   userId: string,
   subscription: { url: string; p256dh: string; auth: string },
 ) {
-  console.log(subscription);
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/notifications`,
     {

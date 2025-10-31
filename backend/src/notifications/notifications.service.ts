@@ -5,12 +5,12 @@ import { SubscriptionDto } from './dto/subscribtion';
 import { validateEnv } from '../config/env.config';
 import { config } from 'dotenv';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../user/user.entity';
 import { RoomService } from '../room/room.service';
 import { Room } from '../room/room.entity';
 import * as webPush from 'web-push';
 import { PushSubscription } from 'web-push';
 import { NotificationPayload } from './dto/notificationPayload';
+import { UserService } from '../user/user.service';
 
 config();
 const env = validateEnv(process.env);
@@ -21,6 +21,7 @@ export class NotificationsService implements OnModuleInit {
     @InjectRepository(Notifications)
     private notificationsRepository: Repository<Notifications>,
     private readonly roomService: RoomService,
+    private userService: UserService,
   ) {}
 
   vapidKey: string = env.VAPID_KEY_PUBLIC;
@@ -30,23 +31,19 @@ export class NotificationsService implements OnModuleInit {
     const vapidPrivateKey = env.VAPID_KEY_PRIVATE;
     const vapidSubject = env.VAPID_SUBJECT;
 
-    webPush.setVapidDetails(vapidPublicKey, vapidPrivateKey, vapidSubject);
-  }
-
-  async create(user: User) {
-    console.log(user);
-    const notification = this.notificationsRepository.create({
-      userId: user.id,
-    });
-    await this.notificationsRepository.save(notification);
+    webPush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
   }
 
   async subscribe(subscriptionDto: SubscriptionDto, userId: string) {
-    const userNotification = await this.notificationsRepository.findOne({
+    let userNotification = await this.notificationsRepository.findOne({
       where: { userId },
     });
-    if (!userNotification)
-      throw new NotFoundException(`this user doesn't exist`);
+    if (!userNotification) {
+      const user = await this.userService.findOneById(userId);
+      userNotification = this.notificationsRepository.create({
+        userId: user.id,
+      });
+    }
     userNotification.url = subscriptionDto.url;
     userNotification.authKey = subscriptionDto.auth;
     userNotification.encryptionKey = subscriptionDto.p256dh;
@@ -62,15 +59,6 @@ export class NotificationsService implements OnModuleInit {
     userNotification.url = null;
     userNotification.authKey = null;
     userNotification.encryptionKey = null;
-  }
-
-  async getUserNotificationsData(userId: string) {
-    const userNotification = await this.notificationsRepository.findOne({
-      where: { userId },
-    });
-    if (!userNotification)
-      throw new NotFoundException(`this user doesn't exist`);
-    return userNotification;
   }
 
   async getRoomSubscriptions(roomName: string, exeptedId: string[]) {
