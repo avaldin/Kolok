@@ -6,6 +6,7 @@ export class MailService {
   constructor(private mailerService: MailerService) {}
 
   async sendVerificationEmail(email: string, code: string) {
+    console.log(`4`);
     await this.mailerService.sendMail({
       to: email,
       subject: 'Vérification de votre compte',
@@ -15,5 +16,6 @@ export class MailService {
         <p>Ce code expire dans 15 minutes.</p>
       `,
     });
+    console.log(`5`);
   }
 }

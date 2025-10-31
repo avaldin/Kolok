@@ -62,6 +62,7 @@ export class UserService {
       throw new BadRequestException(
         `aucun compte enregistre avec cette adresse.`,
       );
+    console.log(`2`);
     const verificationCode = this.generateVerificationCode();
     const verificationCodeExpires = new Date();
     verificationCodeExpires.setMinutes(
@@ -73,6 +74,7 @@ export class UserService {
 
     await this.userRepository.save(existingUser);
 
+    console.log(`3`);
     await this.mailService.sendVerificationEmail(
       existingUser.email,
       verificationCode,
