@@ -51,7 +51,9 @@ export function useServiceWorker(userId: string) {
   }, []);
 
   const subscribeToNotifications = async () => {
-    if (!registration) throw new Error('Service worker pas encore enregistre');
+    if (!registration) {
+      throw new Error('Service worker pas encore enregistre');
+    }
 
     const permission = await Notification.requestPermission();
 
@@ -83,11 +85,14 @@ export function useServiceWorker(userId: string) {
   };
 
   const unSubscribeToNotifications = async () => {
-    if (!subscription || !registration)
+    if (!subscription || !registration) {
+      await sendUnsubscriptionToBackend(userId);
+
       throw new Error('Service worker pas encore enregistre');
+    }
     try {
       await sendUnsubscriptionToBackend(userId);
-      const success = await registration.unregister();
+      const success = await subscription.unsubscribe();
       if (success) {
         setSubscription(null);
       } else throw new Error('unregister failed');

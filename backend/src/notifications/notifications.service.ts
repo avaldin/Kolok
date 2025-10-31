@@ -38,7 +38,6 @@ export class NotificationsService implements OnModuleInit {
     const userNotification = await this.notificationsRepository.findOne({
       where: { userId },
     });
-    console.log(userNotification, !!userNotification && !!userNotification.url);
     return !!userNotification && !!userNotification.url;
   }
 
