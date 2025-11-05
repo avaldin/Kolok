@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import { Resend } from 'resend';
+import { env } from '../main';
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  private resend: Resend;
+  constructor(private mailerService: MailerService) {
+    this.resend = new Resend(env.RESEND_API_KEY);
+  }
 
   async sendVerificationEmail(email: string, code: string) {
     console.log(`4`);
-    await this.mailerService.sendMail({
+    await this.resend.emails.send({
+      from: 'Kolok <noreply@kolokapp.com>',
       to: email,
       subject: 'Vérification de votre compte',
       html: `

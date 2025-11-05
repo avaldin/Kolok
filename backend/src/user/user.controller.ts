@@ -17,6 +17,7 @@ export class UserController {
   login(@Body() loginUserDto: LoginUserDto) {
     console.log(`1`);
     return this.userService.login(loginUserDto);
+    console.log(`6`);
   }
 
   @Post('verify-email')

@@ -1,11 +1,4 @@
-import {
-  IsEmail,
-  IsNumber,
-  IsString,
-  Max,
-  Min,
-  validateSync,
-} from 'class-validator';
+import { IsNumber, IsString, Max, Min, validateSync } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
 export class EnvConfig {
@@ -32,11 +25,8 @@ export class EnvConfig {
   @IsString()
   VAPID_SUBJECT: string;
 
-  @IsEmail()
-  EMAIL_USER: string;
-
   @IsString()
-  EMAIL_PASS: string;
+  RESEND_API_KEY: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
