@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { Resend } from 'resend';
 import { env } from '../main';
 
 @Injectable()
 export class MailService {
   private resend: Resend;
-  constructor(private mailerService: MailerService) {
+  constructor() {
     this.resend = new Resend(env.RESEND_API_KEY);
   }
 
